@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120">
+  <rect width="200" height="120" fill="#F0EBEB"/>
+  <circle cx="36" cy="60" r="12" fill="#0054C9"/>
+  <path d="M 48 56 L 184 56 L 196 60 L 184 64 L 48 64 Z" fill="#0054C9"/>
+  <text x="100" y="100" font-family="Inter, Helvetica" font-size="13" fill="#5a5a5a" text-anchor="middle">Self-tapping screw</text>
+</svg>

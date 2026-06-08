@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120">
+  <rect width="200" height="120" fill="#F0EBEB"/>
+  <rect x="34" y="48" width="22" height="24" rx="2" fill="#0054C9"/>
+  <rect x="56" y="54" width="120" height="12" fill="#0054C9"/>
+  <polygon points="176,52 196,60 176,68" fill="#0054C9"/>
+  <text x="100" y="100" font-family="Inter, Helvetica" font-size="13" fill="#5a5a5a" text-anchor="middle">Expansion anchor</text>
+</svg>
