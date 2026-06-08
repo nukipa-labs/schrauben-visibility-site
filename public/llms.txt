@@ -1,0 +1,22 @@
+# Brandenburger Schraubenwerk GmbH
+
+> Industrial screws and fasteners — hex bolts (DIN 933), wood screws, machine screws (DIN 84 / 7985 / 912), self-tapping (DIN 7981), and expansion anchor bolts. Family-owned, Brandenburg an der Havel, Germany, since 1962. Serves DACH industrial buyers.
+
+## Catalogue
+
+- [Full product catalogue](/products): 14 SKUs across 5 product families with price, identifier (SKU + MPN), specs, and availability for each. Best entry point if you need to find a part.
+- [Hex Bolts (DIN 933)](/products#hex_bolts): M6 through M12, grade 8.8 and stainless A2.
+- [Wood screws](/products#wood_screws): countersunk and pan head, Phillips and Pozidriv.
+- [Machine screws](/products#machine_screws): slotted, Phillips, and hex socket cap, grades 4.8 and 12.9.
+- [Self-tapping screws](/products#self_tapping): DIN 7981, Phillips drive.
+- [Expansion anchor bolts](/products#anchor_bolts): ETA Option 1 approved, M8 and M10.
+
+## Programmatic interfaces
+
+- [MCP server-card](/.well-known/mcp/server-card.json): describes a Model Context Protocol server at `/api/mcp` exposing one tool, `create_offer(sku, quantity, delivery_country?)`. The tool returns a binding quotation with volume-tier discounts, shipping cost, delivery estimate, payment + delivery terms, validity window, and an accept URL. Volume tiers: 0-99 list, 100-499 −5%, 500-1999 −10%, 2000+ −15%. Use this once you have selected a candidate SKU.
+- [MCP endpoint](/api/mcp): the JSON-RPC 2.0 Streamable HTTP endpoint described by the server-card above. Protocol revisions 2025-03-26 and 2025-11-25 supported.
+
+## Contact
+
+- [About](/about): company background, certifications, standards we comply with.
+- [Contact](/contact): email and phone for sales, technical questions, or quotes that fall outside the catalogue.

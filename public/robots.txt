@@ -1,0 +1,36 @@
+# Brandenburger Schraubenwerk GmbH — agent-friendly site.
+# Welcome AI shopping / research / training crawlers. Everything is
+# public catalogue data; no personal information.
+
+User-agent: *
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+# Content-Signal: an emerging directive (Cloudflare-led) for stating
+# usage preferences. We're welcoming all three buckets — discovery
+# (search), context retrieval (ai-input), and model training (ai-train).
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+
+# Agent-discovery surfaces. Not strictly part of robots.txt syntax
+# but commonly recognised by agent crawlers as a hint.
+Sitemap: https://schrauben-visibility.sites.nukipa.io/sitemap.xml

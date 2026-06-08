@@ -25,6 +25,17 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="de">
+      <head>
+        {/*
+          Agent-discovery <link> tags. Mirror the `Link` HTTP header
+          emitted by middleware.ts for clients that don't parse response
+          headers (some agent runtimes only walk the HTML document).
+          - rel="mcp" — points to the MCP server-card JSON
+          - rel="describedby" — points to llms.txt
+        */}
+        <link rel="mcp"          href="/.well-known/mcp/server-card.json" type="application/json" />
+        <link rel="describedby"  href="/llms.txt"                         type="text/markdown" />
+      </head>
       <body>
         {/*
           Organization JSON-LD lives in the root layout so it's emitted
