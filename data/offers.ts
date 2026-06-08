@@ -102,10 +102,15 @@ export function createOffer(args: {
   sku:               string;
   quantity:          number;
   delivery_country?: string;
-}): Offer {
+}, ctx: { baseUrl?: string } = {}): Offer {
   const sku       = String(args.sku || '').trim();
   const quantity  = Math.floor(Number(args.quantity));
   const country   = (args.delivery_country || 'DE').toUpperCase();
+  // Per-request base URL wins so the accept_url tracks whichever
+  // host actually served the MCP call (works both at localhost in dev
+  // and at the deployed origin). Falls back to the static company.url
+  // when the caller doesn't supply one.
+  const baseUrl   = (ctx.baseUrl || company.url).replace(/\/+$/, '');
 
   if (!sku) throw new OfferError('invalid_sku', 'sku is required');
   if (!Number.isFinite(quantity) || quantity < 1)
@@ -154,6 +159,6 @@ export function createOffer(args: {
     valid_until_iso:         validUntil.toISOString(),
     issued_at_iso:           issuedAt.toISOString(),
     seller:                  { name: company.name, url: company.url },
-    accept_url:              `${company.url}/offers/${offerId}`
+    accept_url:              `${baseUrl}/offers/${offerId}`
   };
 }

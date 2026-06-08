@@ -75,11 +75,16 @@ export async function POST(req: Request) {
     if (name !== 'create_offer') return rpcError(id, -32601, `Unknown tool: ${name}`);
 
     try {
+      // Derive baseUrl from the incoming request so the offer's
+      // accept_url is correct in any deployment context — localhost,
+      // a Vercel preview, or the production sites.nukipa.io host.
+      const u = new URL(req.url);
+      const baseUrl = `${u.protocol}//${u.host}`;
       const offer = createOffer({
         sku:              String(args.sku ?? ''),
         quantity:         Number(args.quantity ?? 0),
         delivery_country: typeof args.delivery_country === 'string' ? args.delivery_country : undefined
-      });
+      }, { baseUrl });
       // MCP spec: tool results are wrapped as `content: [{type: "text"|"json", ...}]`.
       // We emit one text part with the JSON-stringified offer — every MCP
       // client (incl. our audit's request_offer executor) decodes that.
