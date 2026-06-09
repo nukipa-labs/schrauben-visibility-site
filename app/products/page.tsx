@@ -99,6 +99,30 @@ export default function CatalogPage() {
         </p>
       </aside>
 
+      {/*
+        Sample quotes — real <a> links. Agents that only follow
+        hyperlinks (ChatGPT-style) need at least one concrete URL
+        they can click rather than synthesise from the prose
+        contract above. Two examples: a one-line and a multi-line.
+      */}
+      <section style={{ marginBottom: 28 }}>
+        <h2 style={{ fontSize: 18, margin: '0 0 8px' }}>Sample quotes</h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <a
+            href="/offer?sku=HX-M8-40&qty=500&delivery_country=DE"
+            style={{ color: '#0054C9', textDecoration: 'underline', fontSize: 14 }}
+          >
+            500 × HX-M8-40 hex bolts → Germany
+          </a>
+          <a
+            href="/offer?items=HX-M8-40:500,HX-M10-50:300,WS-CS-4-40:1000&delivery_country=DE"
+            style={{ color: '#0054C9', textDecoration: 'underline', fontSize: 14 }}
+          >
+            Multi-line: 500 × HX-M8-40 + 300 × HX-M10-50 + 1000 × WS-CS-4-40 → Germany
+          </a>
+        </div>
+      </section>
+
       {grouped.map(({ category, items }) => (
         <section key={category.key} id={category.key} style={{ marginBottom: 36 }}>
           <h2 style={{ fontSize: 20, margin: '0 0 6px', borderBottom: '2px solid #0054C9', paddingBottom: 6 }}>

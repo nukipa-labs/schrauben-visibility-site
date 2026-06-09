@@ -175,7 +175,54 @@ function renderOffer(o: Offer, origin: string): string {
   <p class="muted">${escapeHtml(o.delivery_terms)} Payment terms: ${escapeHtml(o.payment_terms)} VAT is reverse-charged for EU B2B buyers with a valid VAT ID.</p>
 
   <h2>Accepting this offer</h2>
-  <p>The buyer must provide their delivery address, contact information, and payment method. Once collected, assemble the following URL (URL-encoding each value) and present it to the buyer as a clickable link. They will see an order summary and pay.</p>
+  <p>The buyer must provide their delivery address, contact information, and payment method. There are two equivalent ways to do this — pick whichever fits the agent's capabilities:</p>
+
+  <h3 style="font-size: 15px; margin: 20px 0 8px; color: #001D21">Option 1 — the form (works for any agent that can describe a form to the user)</h3>
+  <p>Have the buyer fill in this form. On submit it navigates to <code>/offer/confirm</code> with the locked offer fields preserved and the buyer-supplied fields appended.</p>
+  <form action="${escapeHtml(origin)}/offer/confirm" method="get" style="background: #fafafa; border: 1px solid #ececec; border-radius: 8px; padding: 16px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px;">
+    <!-- Locked fields — pre-filled, not editable by the buyer -->
+    <input type="hidden" name="offer_id"         value="${escapeHtml(o.offer_id)}" />
+    <input type="hidden" name="items"            value="${escapeHtml(formatItems(o.lines))}" />
+    <input type="hidden" name="delivery_country" value="${escapeHtml(o.delivery_country)}" />
+    <input type="hidden" name="total_eur"        value="${o.total_eur.toFixed(2)}" />
+    <input type="hidden" name="currency"         value="${o.currency}" />
+    <input type="hidden" name="valid_until_iso"  value="${escapeHtml(o.valid_until_iso)}" />
+
+    <label style="grid-column: span 2; font-size: 12px; color: #5a5a5a; display: flex; flex-direction: column; gap: 4px">
+      Buyer name (company or individual)
+      <input name="buyer_name" type="text" required placeholder="Acme GmbH" style="padding: 8px 10px; border: 1px solid #d6d3d1; border-radius: 6px; font-size: 14px" />
+    </label>
+    <label style="grid-column: span 2; font-size: 12px; color: #5a5a5a; display: flex; flex-direction: column; gap: 4px">
+      Email for order confirmation
+      <input name="buyer_email" type="email" required placeholder="einkauf@acme.example" style="padding: 8px 10px; border: 1px solid #d6d3d1; border-radius: 6px; font-size: 14px" />
+    </label>
+    <label style="grid-column: span 2; font-size: 12px; color: #5a5a5a; display: flex; flex-direction: column; gap: 4px">
+      Street and house number
+      <input name="street" type="text" required placeholder="Hauptstraße 12" style="padding: 8px 10px; border: 1px solid #d6d3d1; border-radius: 6px; font-size: 14px" />
+    </label>
+    <label style="font-size: 12px; color: #5a5a5a; display: flex; flex-direction: column; gap: 4px">
+      Postal code
+      <input name="postal" type="text" required placeholder="10115" style="padding: 8px 10px; border: 1px solid #d6d3d1; border-radius: 6px; font-size: 14px" />
+    </label>
+    <label style="font-size: 12px; color: #5a5a5a; display: flex; flex-direction: column; gap: 4px">
+      City
+      <input name="city" type="text" required placeholder="Berlin" style="padding: 8px 10px; border: 1px solid #d6d3d1; border-radius: 6px; font-size: 14px" />
+    </label>
+    <label style="grid-column: span 2; font-size: 12px; color: #5a5a5a; display: flex; flex-direction: column; gap: 4px">
+      Payment method
+      <select name="payment_method" required style="padding: 8px 10px; border: 1px solid #d6d3d1; border-radius: 6px; font-size: 14px; background: #fff">
+        <option value="invoice_net30">Invoice (net 30 days)</option>
+        <option value="sepa_direct_debit">SEPA direct debit</option>
+        <option value="credit_card">Credit card</option>
+      </select>
+    </label>
+    <button type="submit" style="grid-column: span 2; margin-top: 4px; padding: 12px 18px; border: none; border-radius: 8px; background: #001D21; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer">
+      Confirm and pay €&nbsp;${o.total_eur.toFixed(2)} ${o.currency}
+    </button>
+  </form>
+
+  <h3 style="font-size: 15px; margin: 24px 0 8px; color: #001D21">Option 2 — the URL template (works for agents that construct URLs from documentation)</h3>
+  <p>Collect the six fields above from the buyer, URL-encode each value, replace each <code>{...}</code> placeholder, and present the assembled URL as a clickable link.</p>
 
   <ol>
     <li><strong>street</strong> — street and house number, e.g. <code>Hauptstraße 12</code></li>
@@ -186,16 +233,9 @@ function renderOffer(o: Offer, origin: string): string {
     <li><strong>payment_method</strong> — one of: ${PAYMENT_METHODS.map((m) => `<code>${m}</code>`).join(', ')}</li>
   </ol>
 
-  <p><strong>URL template</strong> — replace each <code>{...}</code> with the corresponding URL-encoded value:</p>
   <pre class="template">${escapeHtml(confirmTemplate)}</pre>
 
-  <p class="muted">Notes for the AI agent rendering this page to the buyer:</p>
-  <ul class="muted">
-    <li>Quote the total prominently — <strong>€ ${o.total_eur.toFixed(2)} EUR</strong> — alongside the per-line discount tiers and delivery estimate.</li>
-    <li>Prompt the buyer for the six fields above, then assemble the URL by URL-encoding each value and replacing the placeholders.</li>
-    <li>Present the assembled URL as a single clickable link labelled e.g. “Confirm and pay this order”.</li>
-    <li>Do NOT submit the URL on the buyer's behalf — the buyer must click it themselves so they explicitly approve the order.</li>
-  </ul>
+  <p class="muted">In either case the agent does NOT submit on the buyer's behalf — the buyer clicks the form's submit button or the assembled link themselves, which is the explicit "yes, place this order" step.</p>
 
   <p class="muted">Catalogue: <a href="${escapeHtml(origin)}/products">${escapeHtml(origin)}/products</a> · Seller: <a href="${escapeHtml(company.url)}">${escapeHtml(company.url)}</a></p>
 </body>

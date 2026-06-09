@@ -140,10 +140,44 @@ export default async function ProductDetailPage({ params }: PageProps) {
         </table>
       </section>
 
-      {/* No human ordering section. This demo site has no sales team
-          / phone / contact form by design — the GET /offer endpoint
-          documented in the agent-commerce panel above is the only
-          path to a quote. */}
+      {/*
+        Quick-quote real <a> links. Two reasons:
+          (a) ChatGPT's browsing tool (and others like it) follows
+              hyperlinks but doesn't construct URLs from prose
+              documentation — without these, the agent reads the
+              "/offer?sku=…&qty=…&delivery_country=…" template and
+              has no way to fetch it. With these, it just clicks.
+          (b) The four quantities are deliberately picked to span
+              every volume tier (50 → list, 250 → −5%, 1000 → −10%,
+              5000 → −15%) so a buyer sampling them sees how the
+              pricing schedule actually behaves.
+      */}
+      <section style={{ marginBottom: 28 }}>
+        <h2 style={{ fontSize: 20, margin: '0 0 8px' }}>Quick quotes</h2>
+        <p className="muted" style={{ margin: '0 0 12px', fontSize: 13 }}>
+          Sample binding quotes for delivery to Germany. Each link goes to the live <code>/offer</code> endpoint with the SKU + quantity + country pre-filled.
+        </p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+          {[
+            { qty: 50,   tierNote: 'list price' },
+            { qty: 250,  tierNote: '−5%'  },
+            { qty: 1000, tierNote: '−10%' },
+            { qty: 5000, tierNote: '−15%' }
+          ].map(({ qty, tierNote }) => (
+            <a key={qty}
+               href={`/offer?sku=${product.sku}&qty=${qty}&delivery_country=DE`}
+               style={{
+                 display: 'inline-flex', alignItems: 'baseline', gap: 8,
+                 padding: '10px 16px', borderRadius: 8,
+                 background: '#fff', border: '1px solid #0054C9', color: '#0054C9',
+                 textDecoration: 'none', fontSize: 14, fontWeight: 600
+               }}>
+              <span>Quote for {qty.toLocaleString()} pieces → DE</span>
+              <span style={{ fontSize: 11, color: '#5a5a5a', fontWeight: 400 }}>{tierNote}</span>
+            </a>
+          ))}
+        </div>
+      </section>
 
       <p className="muted" style={{ fontSize: 13 }}>
         <Link href="/products">← Back to the catalogue</Link>
