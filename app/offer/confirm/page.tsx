@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { company } from '../../../data/company';
-import { PAYMENT_METHODS, type PaymentMethod } from '../../../lib/pricing';
+import { PAYMENT_METHODS, parseItems, type PaymentMethod, type LineItem } from '../../../lib/pricing';
+import { productBySku } from '../../../data/products';
 
 interface PageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -35,7 +36,7 @@ export default async function ConfirmOfferPage({ searchParams }: PageProps) {
             <strong>Missing or invalid order details.</strong> {order.reason}
           </p>
           <p style={{ margin: '10px 0 0', fontSize: 13, color: '#7f1d1d' }}>
-            This URL is normally assembled by an AI agent after collecting the buyer's delivery address, contact, and payment method. To start over, request a fresh offer at <code>/offer?sku=…&amp;qty=…&amp;delivery_country=…</code>.
+            This URL is normally assembled by an AI agent after collecting the buyer's delivery address, contact, and payment method. To start over, request a fresh offer at <code>/offer?items=SKU:qty,SKU:qty&amp;delivery_country=…</code>.
           </p>
         </div>
         <p style={{ marginTop: 16, fontSize: 13 }}><Link href="/products">← Back to the catalogue</Link></p>
@@ -46,7 +47,7 @@ export default async function ConfirmOfferPage({ searchParams }: PageProps) {
   const o = order.data;
 
   return (
-    <article style={{ maxWidth: 720 }}>
+    <article style={{ maxWidth: 760 }}>
       <p className="muted" style={{ margin: 0, fontSize: 13 }}>
         <Link href="/">Home</Link> · <Link href="/products">Products</Link> · Confirm offer
       </p>
@@ -59,11 +60,33 @@ export default async function ConfirmOfferPage({ searchParams }: PageProps) {
       </header>
 
       <section className="card" style={{ marginBottom: 20 }}>
-        <h2 style={{ fontSize: 16, margin: '0 0 10px' }}>Order summary</h2>
-        <Row label="SKU">                  <code>{o.sku}</code></Row>
-        <Row label="Quantity">              {o.qty.toLocaleString()} pieces</Row>
-        <Row label="Delivery country">      <strong>{o.delivery_country}</strong></Row>
-        <Row label="Total">                 <strong style={{ fontSize: 18 }}>€ {o.total_eur.toFixed(2)} {o.currency}</strong></Row>
+        <h2 style={{ fontSize: 16, margin: '0 0 10px' }}>Line items</h2>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+          <thead>
+            <tr style={{ textAlign: 'left', borderBottom: '1px solid #ececec' }}>
+              <th style={{ padding: '6px 8px', color: '#5a5a5a', fontWeight: 500, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>SKU</th>
+              <th style={{ padding: '6px 8px', color: '#5a5a5a', fontWeight: 500, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Product</th>
+              <th style={{ padding: '6px 8px', color: '#5a5a5a', fontWeight: 500, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'right' }}>Qty</th>
+            </tr>
+          </thead>
+          <tbody>
+            {o.items.map((it) => {
+              const product = productBySku(it.sku);
+              return (
+                <tr key={it.sku} style={{ borderBottom: '1px solid #f3f3f3' }}>
+                  <td style={{ padding: '6px 8px', fontFamily: 'Menlo, monospace' }}>{it.sku}</td>
+                  <td style={{ padding: '6px 8px' }}>{product?.name || <span className="muted">(unknown SKU — verify the offer)</span>}</td>
+                  <td style={{ padding: '6px 8px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{it.qty.toLocaleString()}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+
+        <div style={{ marginTop: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderTop: '2px solid #001D21', paddingTop: 10 }}>
+          <span style={{ color: '#5a5a5a', fontSize: 13 }}>Total ({o.items.length} line item{o.items.length === 1 ? '' : 's'}, shipping incl.)</span>
+          <strong style={{ fontSize: 22 }}>€ {o.total_eur.toFixed(2)} {o.currency}</strong>
+        </div>
       </section>
 
       <section className="card" style={{ marginBottom: 20 }}>
@@ -128,8 +151,7 @@ type Order = {
   ok: true;
   data: {
     offer_id:         string;
-    sku:              string;
-    qty:              number;
+    items:            LineItem[];
     delivery_country: string;
     total_eur:        number;
     currency:         string;
@@ -151,13 +173,29 @@ function readOrder(sp: Record<string, string | string[] | undefined>): Order | O
     return typeof v === 'string' ? v : '';
   };
 
-  const required = ['offer_id','sku','qty','delivery_country','total_eur','currency','valid_until_iso','street','postal','city','buyer_name','buyer_email','payment_method'] as const;
+  // Items source: either `items=SKU:qty,SKU:qty` (canonical) OR the
+  // legacy single-SKU triple `sku=…&qty=…` (so an agent that called
+  // the single-SKU shorthand on /offer doesn't have to relearn a
+  // different shape for the confirm URL).
+  let items: LineItem[] | null = null;
+  const rawItems = str('items');
+  if (rawItems) {
+    const parsed = parseItems(rawItems);
+    if (typeof parsed === 'string') return { ok: false, reason: `items parameter: ${parsed}.` };
+    items = parsed;
+  } else if (str('sku') && str('qty')) {
+    const qty = Number(str('qty'));
+    if (!Number.isInteger(qty) || qty < 1) return { ok: false, reason: 'qty must be a positive integer.' };
+    items = [{ sku: str('sku'), qty }];
+  } else {
+    return { ok: false, reason: 'No items in the URL. Either `items=SKU:qty,SKU:qty` or `sku=…&qty=…` is required.' };
+  }
+
+  const required = ['offer_id','delivery_country','total_eur','currency','valid_until_iso','street','postal','city','buyer_name','buyer_email','payment_method'] as const;
   const missing  = required.filter((k) => !str(k));
   if (missing.length) return { ok: false, reason: `Missing fields: ${missing.join(', ')}.` };
 
-  const qty       = Number(str('qty'));
   const total_eur = Number(str('total_eur'));
-  if (!Number.isFinite(qty) || qty <= 0)             return { ok: false, reason: 'qty must be a positive integer.' };
   if (!Number.isFinite(total_eur) || total_eur <= 0) return { ok: false, reason: 'total_eur must be a positive number.' };
 
   const payment_method = str('payment_method');
@@ -165,8 +203,6 @@ function readOrder(sp: Record<string, string | string[] | undefined>): Order | O
     return { ok: false, reason: `payment_method must be one of: ${PAYMENT_METHODS.join(', ')}.` };
   }
 
-  // Light email shape check — not strict validation, just to catch the
-  // common "agent forgot to URL-encode the @" case visibly.
   const email = str('buyer_email');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return { ok: false, reason: `buyer_email does not look like a valid email address: ${email}.` };
@@ -176,8 +212,7 @@ function readOrder(sp: Record<string, string | string[] | undefined>): Order | O
     ok: true,
     data: {
       offer_id:         str('offer_id'),
-      sku:              str('sku'),
-      qty,
+      items,
       delivery_country: str('delivery_country').toUpperCase(),
       total_eur,
       currency:         str('currency'),

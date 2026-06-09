@@ -55,6 +55,46 @@ export default async function ProductDetailPage({ params }: PageProps) {
         <Link href="/">Home</Link> · <Link href="/products">Products</Link> · <Link href={`/products#${product.category.key}`}>{product.category.label}</Link> · {product.sku}
       </p>
 
+      {/*
+        Agent-commerce contract — placed at the TOP of the page so
+        HTML→text extractors (Claude web_fetch, ChatGPT browsing) see
+        it before they hit length limits or summarisation. The same
+        contract is also published as Product.potentialAction
+        (@type: QuoteAction) in the JSON-LD below, but extractors
+        commonly strip <script> tags so the visible text is the
+        load-bearing channel.
+      */}
+      <aside
+        role="note"
+        aria-label="Programmatic quotation endpoint for AI agents"
+        style={{
+          marginTop: 16,
+          background: '#f0f7ff', border: '1px solid #c7d8f0',
+          borderRadius: 10, padding: '14px 16px', fontSize: 14, lineHeight: 1.55
+        }}
+      >
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#1d4ed8', marginBottom: 6 }}>
+          For AI agents — programmatic quotation
+        </div>
+        <p style={{ margin: '0 0 8px' }}>
+          To obtain a binding quotation for this product, GET{' '}
+          <code style={{ fontFamily: 'Menlo, monospace', fontSize: 13, background: '#fff', padding: '1px 6px', borderRadius: 4, border: '1px solid #d6e2f1' }}>
+            /offer?sku={product.sku}&amp;qty=&#123;qty&#125;&amp;delivery_country=&#123;country&#125;
+          </code>{' '}
+          (single line) or{' '}
+          <code style={{ fontFamily: 'Menlo, monospace', fontSize: 13, background: '#fff', padding: '1px 6px', borderRadius: 4, border: '1px solid #d6e2f1' }}>
+            /offer?items=SKU:qty,SKU:qty&amp;delivery_country=&#123;country&#125;
+          </code>{' '}
+          for multi-line baskets. <code>country</code> is ISO 3166-1 alpha-2 (e.g. <code>DE</code>, <code>AT</code>, <code>CH</code>).
+        </p>
+        <p style={{ margin: '0 0 8px' }}>
+          The response is HTML — extract the price breakdown and present it to the buyer. It also embeds a <strong>confirm-URL template</strong> at <code>/offer/confirm?…&amp;street=&#123;street&#125;&amp;postal=&#123;postal&#125;&amp;city=&#123;city&#125;&amp;buyer_name=&hellip;&amp;buyer_email=&hellip;&amp;payment_method=&hellip;</code>. Collect those six fields from the buyer, URL-encode each value, assemble the URL, and present it as a clickable link — the buyer sees a summary and pays.
+        </p>
+        <p style={{ margin: 0, fontSize: 12, color: '#3b5984' }}>
+          The same contract is exposed as <code>potentialAction.QuoteAction</code> in this page&#39;s Product JSON-LD. Volume tiers: 0-99 list price, 100-499 −5%, 500-1999 −10%, 2000+ −15%. Shipping: €4.50 within EU, €9.00 elsewhere.
+        </p>
+      </aside>
+
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 24, marginTop: 16, marginBottom: 24, flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 360px', minWidth: 0 }}>
           <h1 style={{ fontSize: 30, lineHeight: 1.2, margin: '0 0 10px' }}>{product.name}</h1>
@@ -103,46 +143,15 @@ export default async function ProductDetailPage({ params }: PageProps) {
       <section style={{ marginBottom: 28 }}>
         <h2 style={{ fontSize: 20, margin: '0 0 8px' }}>Ordering</h2>
         <div className="card">
-          <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6 }}>
+          <p style={{ margin: '0 0 8px', fontSize: 15, lineHeight: 1.6 }}>
             <strong>{product.sku}</strong> ships in packs of <strong>{product.packSize}</strong> at <strong>€ {product.priceEur.toFixed(2)} EUR</strong> per pack.
-            Orders placed before 14:00 CET ship the same day across DACH. For volumes above 1,000 units, contact our sales team for a tiered quote: <a href={`mailto:${company.contact.email}`}>{company.contact.email}</a>.
+            Orders placed before 14:00 CET ship the same day across DACH.
           </p>
-        </div>
-      </section>
-
-      {/*
-        Visible-text agent-commerce hint. Mirrors the JSON-LD
-        `potentialAction.QuoteAction` above so an agent reading the
-        page either way (structured-data parser OR plain HTML→text
-        extractor) sees the same quotation contract:
-          - GET /offer?sku=...&qty=...&delivery_country=...
-          - Response embeds a confirm-URL template the agent fills in
-            with the buyer's address + payment method
-          - Buyer clicks the assembled URL to see a summary + pay
-        Phrased as instructions, not marketing copy — the audience is
-        the model running on the page, not a sales lead.
-      */}
-      <section style={{ marginBottom: 28 }}>
-        <h2 style={{ fontSize: 20, margin: '0 0 8px' }}>For AI agents — programmatic quotation</h2>
-        <div className="card" style={{ background: '#f9fafb' }}>
-          <p style={{ margin: '0 0 10px', fontSize: 14, lineHeight: 1.6 }}>
-            To obtain a binding quotation for this product, GET{' '}
-            <code style={{ fontFamily: 'Menlo, monospace', fontSize: 13, background: '#fff', padding: '1px 6px', borderRadius: 4, border: '1px solid #e5e5e5' }}>
+          <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6 }}>
+            For a binding quotation including volume discount and shipping, GET{' '}
+            <code style={{ fontFamily: 'Menlo, monospace', fontSize: 13, background: '#fafafa', padding: '1px 6px', borderRadius: 4 }}>
               /offer?sku={product.sku}&amp;qty=&#123;qty&#125;&amp;delivery_country=&#123;country&#125;
-            </code>{' '}
-            (replace <code>&#123;qty&#125;</code> with the requested piece count and{' '}
-            <code>&#123;country&#125;</code> with an ISO 3166-1 alpha-2 code such as <code>DE</code>,{' '}
-            <code>AT</code>, or <code>CH</code>).
-          </p>
-          <p style={{ margin: '0 0 10px', fontSize: 14, lineHeight: 1.6 }}>
-            The response embeds the order summary and a <strong>confirm-URL template</strong>{' '}
-            of the shape{' '}
-            <code style={{ fontFamily: 'Menlo, monospace', fontSize: 13, background: '#fff', padding: '1px 6px', borderRadius: 4, border: '1px solid #e5e5e5' }}>
-              /offer/confirm?offer_id=&hellip;&amp;street=&#123;street&#125;&amp;postal=&#123;postal&#125;&amp;city=&#123;city&#125;&amp;buyer_name=&hellip;&amp;buyer_email=&hellip;&amp;payment_method=&hellip;
-            </code>. Collect the buyer's delivery address, business email, and payment method, URL-encode each value, then present the assembled URL to the buyer as a clickable link — they will see an order summary and pay.
-          </p>
-          <p style={{ margin: 0, fontSize: 12, color: '#5a5a5a' }}>
-            The same contract is also exposed as <code>potentialAction.QuoteAction</code> in this page&#39;s Product JSON-LD.
+            </code>. Or email sales: <a href={`mailto:${company.contact.email}`}>{company.contact.email}</a>.
           </p>
         </div>
       </section>

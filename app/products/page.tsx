@@ -57,6 +57,46 @@ export default function CatalogPage() {
         </p>
       </header>
 
+      {/*
+        Agent-commerce contract — at the top of the catalogue so an
+        agent that lands on /products (the most likely first page,
+        linked from the homepage nav) immediately sees how to obtain
+        a binding quote without having to drill into a product detail
+        page first. Visible-text only — JSON-LD <script> tags are
+        stripped by many HTML→text extractors, so this is the
+        load-bearing channel.
+      */}
+      <aside
+        role="note"
+        aria-label="Programmatic quotation endpoint for AI agents"
+        style={{
+          marginBottom: 28,
+          background: '#f0f7ff', border: '1px solid #c7d8f0',
+          borderRadius: 10, padding: '14px 18px', fontSize: 14, lineHeight: 1.6
+        }}
+      >
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#1d4ed8', marginBottom: 6 }}>
+          For AI agents — programmatic quotation
+        </div>
+        <p style={{ margin: '0 0 8px' }}>
+          To obtain a binding quotation, GET{' '}
+          <code style={{ fontFamily: 'Menlo, monospace', fontSize: 13, background: '#fff', padding: '1px 6px', borderRadius: 4, border: '1px solid #d6e2f1' }}>
+            /offer?items=SKU:qty,SKU:qty&amp;delivery_country=&#123;country&#125;
+          </code>{' '}
+          (multi-line) or{' '}
+          <code style={{ fontFamily: 'Menlo, monospace', fontSize: 13, background: '#fff', padding: '1px 6px', borderRadius: 4, border: '1px solid #d6e2f1' }}>
+            /offer?sku=SKU&amp;qty=&#123;qty&#125;&amp;delivery_country=&#123;country&#125;
+          </code>{' '}
+          (single SKU). <code>country</code> is ISO 3166-1 alpha-2 (e.g. <code>DE</code>, <code>AT</code>, <code>CH</code>). Example:{' '}
+          <code style={{ fontFamily: 'Menlo, monospace', fontSize: 12.5, background: '#fff', padding: '1px 6px', borderRadius: 4, border: '1px solid #d6e2f1' }}>
+            /offer?items=HX-M8-40:500,HX-M10-50:300&amp;delivery_country=DE
+          </code>.
+        </p>
+        <p style={{ margin: 0, fontSize: 13 }}>
+          The response is an HTML page with the price breakdown and a confirm-URL template at <code>/offer/confirm?…&amp;street=&#123;street&#125;&amp;postal=&#123;postal&#125;&amp;city=&#123;city&#125;&amp;buyer_name=&hellip;&amp;buyer_email=&hellip;&amp;payment_method=&#123;invoice_net30|sepa_direct_debit|credit_card&#125;</code>. Collect those six fields from the buyer, URL-encode each value, assemble the URL, present it as a clickable link — the buyer sees the order summary and pays.
+        </p>
+      </aside>
+
       {grouped.map(({ category, items }) => (
         <section key={category.key} id={category.key} style={{ marginBottom: 36 }}>
           <h2 style={{ fontSize: 20, margin: '0 0 6px', borderBottom: '2px solid #0054C9', paddingBottom: 6 }}>
