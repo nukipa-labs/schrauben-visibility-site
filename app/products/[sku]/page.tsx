@@ -64,15 +64,18 @@ export default async function ProductDetailPage({ params }: PageProps) {
       </p>
 
       {/*
-        Agent-commerce contract — placed at the TOP of the page so
-        HTML→text extractors (Claude web_fetch, ChatGPT browsing) see
-        it before they hit length limits or summarisation. The same
-        contract is also published as Product.potentialAction
-        (@type: QuoteAction) in the JSON-LD below, but extractors
-        commonly strip <script> tags so the visible text is the
-        load-bearing channel.
+        Agent-commerce contract — AGENT MODE ONLY. Placed at the TOP
+        of the page so HTML→text extractors (Claude web_fetch, ChatGPT
+        browsing) see it before they hit length limits or
+        summarisation. The same contract is also published as
+        Product.potentialAction (@type: QuoteAction) in the JSON-LD
+        below, but extractors commonly strip <script> tags so the
+        visible text is the load-bearing channel.
+
+        Humans don't see this panel — they get the human Ordering
+        section below instead. UA detection is in lib/userAgent.ts.
       */}
-      <aside
+      {agent && <aside
         role="note"
         aria-label="Programmatic quotation endpoint for AI agents"
         style={{
@@ -101,7 +104,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
         <p style={{ margin: 0, fontSize: 12, color: '#3b5984' }}>
           The same contract is exposed as <code>potentialAction.QuoteAction</code> in this page&#39;s Product JSON-LD. Volume tiers: 0-99 list price, 100-499 −5%, 500-1999 −10%, 2000+ −15%. Shipping: €4.50 within EU, €9.00 elsewhere.
         </p>
-      </aside>
+      </aside>}
 
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 24, marginTop: 16, marginBottom: 24, flexWrap: 'wrap' }}>
         <div style={{ flex: '1 1 360px', minWidth: 0 }}>
