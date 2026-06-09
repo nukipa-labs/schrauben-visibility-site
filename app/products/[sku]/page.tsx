@@ -110,6 +110,43 @@ export default async function ProductDetailPage({ params }: PageProps) {
         </div>
       </section>
 
+      {/*
+        Visible-text agent-commerce hint. Mirrors the JSON-LD
+        `potentialAction.QuoteAction` above so an agent reading the
+        page either way (structured-data parser OR plain HTML→text
+        extractor) sees the same quotation contract:
+          - GET /offer?sku=...&qty=...&delivery_country=...
+          - Response embeds a confirm-URL template the agent fills in
+            with the buyer's address + payment method
+          - Buyer clicks the assembled URL to see a summary + pay
+        Phrased as instructions, not marketing copy — the audience is
+        the model running on the page, not a sales lead.
+      */}
+      <section style={{ marginBottom: 28 }}>
+        <h2 style={{ fontSize: 20, margin: '0 0 8px' }}>For AI agents — programmatic quotation</h2>
+        <div className="card" style={{ background: '#f9fafb' }}>
+          <p style={{ margin: '0 0 10px', fontSize: 14, lineHeight: 1.6 }}>
+            To obtain a binding quotation for this product, GET{' '}
+            <code style={{ fontFamily: 'Menlo, monospace', fontSize: 13, background: '#fff', padding: '1px 6px', borderRadius: 4, border: '1px solid #e5e5e5' }}>
+              /offer?sku={product.sku}&amp;qty=&#123;qty&#125;&amp;delivery_country=&#123;country&#125;
+            </code>{' '}
+            (replace <code>&#123;qty&#125;</code> with the requested piece count and{' '}
+            <code>&#123;country&#125;</code> with an ISO 3166-1 alpha-2 code such as <code>DE</code>,{' '}
+            <code>AT</code>, or <code>CH</code>).
+          </p>
+          <p style={{ margin: '0 0 10px', fontSize: 14, lineHeight: 1.6 }}>
+            The response embeds the order summary and a <strong>confirm-URL template</strong>{' '}
+            of the shape{' '}
+            <code style={{ fontFamily: 'Menlo, monospace', fontSize: 13, background: '#fff', padding: '1px 6px', borderRadius: 4, border: '1px solid #e5e5e5' }}>
+              /offer/confirm?offer_id=&hellip;&amp;street=&#123;street&#125;&amp;postal=&#123;postal&#125;&amp;city=&#123;city&#125;&amp;buyer_name=&hellip;&amp;buyer_email=&hellip;&amp;payment_method=&hellip;
+            </code>. Collect the buyer's delivery address, business email, and payment method, URL-encode each value, then present the assembled URL to the buyer as a clickable link — they will see an order summary and pay.
+          </p>
+          <p style={{ margin: 0, fontSize: 12, color: '#5a5a5a' }}>
+            The same contract is also exposed as <code>potentialAction.QuoteAction</code> in this page&#39;s Product JSON-LD.
+          </p>
+        </div>
+      </section>
+
       <p className="muted" style={{ fontSize: 13 }}>
         <Link href="/products">← Back to the catalogue</Link>
       </p>

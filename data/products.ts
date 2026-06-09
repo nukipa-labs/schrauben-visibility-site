@@ -380,6 +380,29 @@ export function productJsonLd(p: Product) {
       itemCondition:   'https://schema.org/NewCondition',
       eligibleQuantity:{ '@type': 'QuantitativeValue', minValue: 1, unitCode: 'C62' },
       seller:          { '@type': 'Organization', name: company.name, url: company.url }
+    },
+    /*
+     * Agent-discoverable quotation endpoint. The schema.org
+     * `potentialAction` + `EntryPoint.urlTemplate` (RFC 6570) pattern
+     * is how a parser knows: "to get a binding quote for this product,
+     * GET this URL with {qty} and {country} substituted in". Read by
+     * the audit's agent (Claude web_fetch sees the JSON-LD on the page,
+     * follows the urlTemplate) and by any other LLM client that walks
+     * structured data.
+     */
+    potentialAction: {
+      '@type':     'QuoteAction',
+      name:        'Get a binding quotation for this product',
+      target: {
+        '@type':      'EntryPoint',
+        urlTemplate:  `${company.url}/offer?sku=${p.sku}&qty={qty}&delivery_country={country}`,
+        httpMethod:   'GET',
+        contentType:  'text/html'
+      },
+      object: [
+        { '@type': 'PropertyValue', name: 'qty',     valueRequired: true, description: 'Quantity in pieces (integer, 1-100000)' },
+        { '@type': 'PropertyValue', name: 'country', valueRequired: true, description: 'Delivery country as ISO 3166-1 alpha-2 (e.g. DE, AT, CH)' }
+      ]
     }
   };
 }

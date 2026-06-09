@@ -11,6 +11,11 @@
 - [Self-tapping screws](/products#self_tapping): DIN 7981, Phillips drive.
 - [Expansion anchor bolts](/products#anchor_bolts): ETA Option 1 approved, M8 and M10.
 
+## Programmatic interfaces
+
+- [Get a binding quotation](/offer?sku={sku}&qty={qty}&delivery_country={country}): GET endpoint. Returns an HTML offer document for the requested (SKU, quantity, delivery country) — tier-discounted unit price, shipping, total, validity, payment + delivery terms. Volume tiers: 0-99 list price, 100-499 −5%, 500-1999 −10%, 2000+ −15%. Shipping: €4.50 within EU, €9.00 elsewhere. Example: `/offer?sku=HX-M8-40&qty=500&delivery_country=DE`. The same contract is published as schema.org `Product.potentialAction` (`@type: QuoteAction`) inside each product's JSON-LD.
+- [Confirm and pay](/offer/confirm?offer_id=...&sku=...&qty=...&delivery_country=...&total_eur=...&currency=EUR&valid_until_iso=...&street={street}&postal={postal}&city={city}&buyer_name={buyer_name}&buyer_email={buyer_email}&payment_method={invoice_net30|sepa_direct_debit|credit_card}): GET endpoint. The offer response includes the exact URL template above with the locked fields (offer_id, sku, qty, country, total) pre-filled and the buyer-supplied fields as placeholders. An AI agent collects the buyer's address + contact + payment method, URL-encodes them, assembles the URL, and presents it to the buyer as a clickable link. The buyer sees a summary and pays — the agent itself does not submit the URL.
+
 ## Contact
 
 - [About](/about): company background, certifications, standards we comply with.
