@@ -33,4 +33,4 @@ Content-Signal: search=yes, ai-input=yes, ai-train=yes
 
 # Agent-discovery surfaces. Not strictly part of robots.txt syntax
 # but commonly recognised by agent crawlers as a hint.
-Sitemap: https://schrauben-visibility.sites.nukipa.io/sitemap.xml
+Sitemap: https://schraubenwerk.sites.nukipa.io/sitemap.xml
