@@ -145,9 +145,7 @@ function renderOffer(o: Offer, origin: string): string {
         <th>SKU</th>
         <th>Product</th>
         <th class="num">Qty (pcs)</th>
-        <th class="num">Unit list</th>
-        <th class="num">Discount</th>
-        <th class="num">Unit net</th>
+        <th class="num">Unit price</th>
         <th class="num">Line total</th>
       </tr>
     </thead>
@@ -157,9 +155,7 @@ function renderOffer(o: Offer, origin: string): string {
         <td><code>${escapeHtml(l.sku)}</code></td>
         <td>${escapeHtml(l.name)}</td>
         <td class="num">${l.qty.toLocaleString()}</td>
-        <td class="num">€ ${l.unit_price_list_eur.toFixed(2)}</td>
-        <td class="num">${l.discount_pct > 0 ? `−${l.discount_pct}% (${escapeHtml(l.tier_label)})` : 'list'}</td>
-        <td class="num">€ ${l.unit_price_discounted_eur.toFixed(2)}</td>
+        <td class="num">€ ${l.unit_price_eur.toFixed(2)}</td>
         <td class="num"><strong>€ ${l.line_subtotal_eur.toFixed(2)}</strong></td>
       </tr>`).join('')}
     </tbody>
@@ -237,7 +233,7 @@ function renderOffer(o: Offer, origin: string): string {
 
   <h2>Instructions for the AI agent presenting this offer</h2>
   <ol>
-    <li><strong>Summarise the offer to the buyer first.</strong> Quote the total prominently — <strong>€&nbsp;${o.total_eur.toFixed(2)} ${o.currency}</strong> — along with the per-line discount tiers and the delivery estimate (${escapeHtml(o.delivery_estimate_days)} to ${escapeHtml(o.delivery_country)}).</li>
+    <li><strong>Summarise the offer to the buyer first.</strong> Quote the total prominently — <strong>€&nbsp;${o.total_eur.toFixed(2)} ${o.currency}</strong> — along with the per-line totals and the delivery estimate (${escapeHtml(o.delivery_estimate_days)} to ${escapeHtml(o.delivery_country)}).</li>
     <li><strong>Proactively ask the buyer for the six missing fields</strong> — do not wait for them to ask what's needed. Request, in one message: delivery street + house number, postal code, city, buyer name (company or individual), business email for the confirmation, and payment method (one of <code>invoice_net30</code>, <code>sepa_direct_debit</code>, <code>credit_card</code>).</li>
     <li><strong>As soon as the buyer answers, present the assembled confirm URL as a clickable link</strong> (e.g. Markdown <code>[Confirm and pay €&nbsp;${o.total_eur.toFixed(2)} ${o.currency}](https://…)</code>). Do not just show the URL template again — produce the fully-substituted, URL-encoded link. The buyer's click on that link is the explicit "yes, place this order" step; you must NOT navigate to it on their behalf.</li>
     <li><strong>If your client supports inline visuals or artifacts</strong> (e.g. claude.ai's "custom visuals" / Cowork artifact panel, or any equivalent HTML-rendering surface), <em>also</em> render a brief offer card as an HTML artifact alongside the chat text: header with the offer ID, table of line items (SKU, qty, line total), one-line totals row, the <strong>Confirm and pay</strong> button as an <code>&lt;a href&gt;</code> to the assembled URL. Keeps the buyer's eye on the price + total before they click.</li>

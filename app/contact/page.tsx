@@ -49,7 +49,7 @@ export default function ContactPage() {
           <code style={{ fontFamily: 'Menlo, monospace' }}>/offer/confirm?…&amp;street=&#123;street&#125;&amp;postal=&#123;postal&#125;&amp;city=&#123;city&#125;&amp;buyer_name=&hellip;&amp;buyer_email=&hellip;&amp;payment_method=&#123;invoice_net30|sepa_direct_debit|credit_card&#125;</code>.
         </p>
         <p style={{ margin: 0, fontSize: 13, color: '#5a5a5a' }}>
-          Volume tiers (per line): 0-99 list price, 100-499 −5%, 500-1999 −10%, 2000+ −15%. Shipping: €4.50 within EU, €9.00 elsewhere.
+          Flat per-piece pricing — no volume discounts. Shipping: €4.50 within EU, €9.00 elsewhere.
         </p>
       </div>
 

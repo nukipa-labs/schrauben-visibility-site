@@ -91,7 +91,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
           The response is HTML — extract the price breakdown and present it to the buyer. It also embeds a <strong>confirm-URL template</strong> at <code>/offer/confirm?…&amp;street=&#123;street&#125;&amp;postal=&#123;postal&#125;&amp;city=&#123;city&#125;&amp;buyer_name=&hellip;&amp;buyer_email=&hellip;&amp;payment_method=&hellip;</code>. Collect those six fields from the buyer, URL-encode each value, assemble the URL, and present it as a clickable link — the buyer sees a summary and pays.
         </p>
         <p style={{ margin: 0, fontSize: 12, color: '#3b5984' }}>
-          The same contract is exposed as <code>potentialAction.QuoteAction</code> in this page&#39;s Product JSON-LD. Volume tiers: 0-99 list price, 100-499 −5%, 500-1999 −10%, 2000+ −15%. Shipping: €4.50 within EU, €9.00 elsewhere.
+          The same contract is exposed as <code>potentialAction.QuoteAction</code> in this page&#39;s Product JSON-LD. Flat per-piece pricing — no volume discounts. Shipping: €4.50 within EU, €9.00 elsewhere.
         </p>
       </aside>
 
@@ -138,41 +138,29 @@ export default async function ProductDetailPage({ params }: PageProps) {
       </section>
 
       {/*
-        Quick-quote real <a> links. Two reasons:
-          (a) ChatGPT's browsing tool (and others like it) follows
-              hyperlinks but doesn't construct URLs from prose
-              documentation — without these, the agent reads the
-              "/offer?sku=…&qty=…&delivery_country=…" template and
-              has no way to fetch it. With these, it just clicks.
-          (b) The four quantities are deliberately picked to span
-              every volume tier (50 → list, 250 → −5%, 1000 → −10%,
-              5000 → −15%) so a buyer sampling them sees how the
-              pricing schedule actually behaves.
+        Sample quote. One concrete clickable example so an agent can
+        verify the endpoint works before constructing its own URL.
+        Previous version had four preset quantity buttons (50/250/
+        1000/5000) — the agent picked one at random ("closest preset
+        to the user's requested 500") and ended up off by 10×.
+        Single sample with a clear "or construct your own" hint is
+        less misleading.
       */}
       <section style={{ marginBottom: 28 }}>
-        <h2 style={{ fontSize: 20, margin: '0 0 8px' }}>Quick quotes</h2>
+        <h2 style={{ fontSize: 20, margin: '0 0 8px' }}>Sample quote</h2>
         <p className="muted" style={{ margin: '0 0 12px', fontSize: 13 }}>
-          Sample binding quotes for delivery to Germany. Each link goes to the live <code>/offer</code> endpoint with the SKU + quantity + country pre-filled.
+          One concrete example for delivery to Germany. To request your own quantity, substitute it into the <code>/offer</code> URL template shown in the panel above.
         </p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-          {[
-            { qty: 50,   tierNote: 'list price' },
-            { qty: 250,  tierNote: '−5%'  },
-            { qty: 1000, tierNote: '−10%' },
-            { qty: 5000, tierNote: '−15%' }
-          ].map(({ qty, tierNote }) => (
-            <a key={qty}
-               href={`/offer?sku=${product.sku}&qty=${qty}&delivery_country=DE`}
-               style={{
-                 display: 'inline-flex', alignItems: 'baseline', gap: 8,
-                 padding: '10px 16px', borderRadius: 8,
-                 background: '#fff', border: '1px solid #0054C9', color: '#0054C9',
-                 textDecoration: 'none', fontSize: 14, fontWeight: 600
-               }}>
-              <span>Quote for {qty.toLocaleString()} pieces → DE</span>
-              <span style={{ fontSize: 11, color: '#5a5a5a', fontWeight: 400 }}>{tierNote}</span>
-            </a>
-          ))}
+          <a href={`/offer?sku=${product.sku}&qty=100&delivery_country=DE`}
+             style={{
+               display: 'inline-flex', alignItems: 'baseline', gap: 8,
+               padding: '10px 16px', borderRadius: 8,
+               background: '#fff', border: '1px solid #0054C9', color: '#0054C9',
+               textDecoration: 'none', fontSize: 14, fontWeight: 600
+             }}>
+            <span>Sample: 100 pieces → DE</span>
+          </a>
         </div>
       </section>
 

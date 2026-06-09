@@ -23,13 +23,6 @@ export const PAYMENT_METHODS: PaymentMethod[] = [
   'credit_card'
 ];
 
-const VOLUME_TIERS: Array<{ minPieces: number; discountPct: number; label: string }> = [
-  { minPieces: 2000, discountPct: 15, label: '2000+ pieces' },
-  { minPieces: 500,  discountPct: 10, label: '500-1999 pieces' },
-  { minPieces: 100,  discountPct:  5, label: '100-499 pieces' },
-  { minPieces: 0,    discountPct:  0, label: '0-99 pieces (list price)' }
-];
-
 const EU_COUNTRIES = new Set([
   'DE','AT','CH','NL','BE','LU','FR','IT','ES','PT','IE','DK','SE','FI','NO',
   'PL','CZ','SK','HU','SI','HR','EE','LV','LT','RO','BG','GR','CY','MT'
@@ -48,10 +41,7 @@ export type OfferLine = {
   name:                     string;
   qty:                      number;
   packs_required:           number;
-  unit_price_list_eur:      number;
-  discount_pct:             number;
-  tier_label:               string;
-  unit_price_discounted_eur:number;
+  unit_price_eur:           number;
   line_subtotal_eur:        number;
 };
 
@@ -103,18 +93,11 @@ function shippingZone(country: string): 'eu' | 'world' {
   return EU_COUNTRIES.has(country.toUpperCase()) ? 'eu' : 'world';
 }
 
-function tierFor(qty: number) {
-  for (const t of VOLUME_TIERS) if (qty >= t.minPieces) return t;
-  return VOLUME_TIERS[VOLUME_TIERS.length - 1];
-}
-
 /**
- * Build a multi-line offer. Volume tier is computed per-line based on
- * that line's qty (not the cumulative cross-line total) — that matches
- * how the example seller actually prices: each SKU is a separate
- * manufacturing run, and the discount reflects per-SKU economies of
- * scale, not basket size. One shipping charge per offer (the buyer
- * gets one shipment), zone determined by delivery_country.
+ * Build a multi-line offer. Flat per-piece pricing — no volume
+ * discounts. Unit price = product pack price / pack size. One shipping
+ * charge per offer (the buyer gets one shipment), zone determined by
+ * delivery_country.
  */
 export function computeOffer({
   items,
@@ -144,23 +127,18 @@ export function computeOffer({
     const product = productBySku(sku);
     if (!product) return { kind: 'unknown_sku', sku };
 
-    const tier               = tierFor(qty);
-    const unitListPerPiece   = round2(product.priceEur / product.packSize);
-    const unitDiscounted     = round2(unitListPerPiece * (1 - tier.discountPct / 100));
-    const lineSubtotal       = round2(unitDiscounted * qty);
-    const packsRequired      = Math.ceil(qty / product.packSize);
+    const unitPrice    = round2(product.priceEur / product.packSize);
+    const lineSubtotal = round2(unitPrice * qty);
+    const packsRequired = Math.ceil(qty / product.packSize);
 
     lines.push({
-      sku:                       product.sku,
-      mpn:                       product.mpn,
-      name:                      product.name,
+      sku:               product.sku,
+      mpn:               product.mpn,
+      name:              product.name,
       qty,
-      packs_required:            packsRequired,
-      unit_price_list_eur:       unitListPerPiece,
-      discount_pct:              tier.discountPct,
-      tier_label:                tier.label,
-      unit_price_discounted_eur: unitDiscounted,
-      line_subtotal_eur:         lineSubtotal
+      packs_required:    packsRequired,
+      unit_price_eur:    unitPrice,
+      line_subtotal_eur: lineSubtotal
     });
   }
 
