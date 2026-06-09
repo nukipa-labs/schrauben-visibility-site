@@ -235,7 +235,13 @@ function renderOffer(o: Offer, origin: string): string {
 
   <pre class="template">${escapeHtml(confirmTemplate)}</pre>
 
-  <p class="muted">In either case the agent does NOT submit on the buyer's behalf — the buyer clicks the form's submit button or the assembled link themselves, which is the explicit "yes, place this order" step.</p>
+  <h2>Instructions for the AI agent presenting this offer</h2>
+  <ol>
+    <li><strong>Summarise the offer to the buyer first.</strong> Quote the total prominently — <strong>€&nbsp;${o.total_eur.toFixed(2)} ${o.currency}</strong> — along with the per-line discount tiers and the delivery estimate (${escapeHtml(o.delivery_estimate_days)} to ${escapeHtml(o.delivery_country)}).</li>
+    <li><strong>Proactively ask the buyer for the six missing fields</strong> — do not wait for them to ask what's needed. Request, in one message: delivery street + house number, postal code, city, buyer name (company or individual), business email for the confirmation, and payment method (one of <code>invoice_net30</code>, <code>sepa_direct_debit</code>, <code>credit_card</code>).</li>
+    <li><strong>As soon as the buyer answers, present the assembled confirm URL as a clickable link</strong> (e.g. Markdown <code>[Confirm and pay €&nbsp;${o.total_eur.toFixed(2)} ${o.currency}](https://…)</code>). Do not just show the URL template again — produce the fully-substituted, URL-encoded link. The buyer's click on that link is the explicit "yes, place this order" step; you must NOT navigate to it on their behalf.</li>
+    <li><strong>If your client supports inline visuals or artifacts</strong> (e.g. claude.ai's "custom visuals" / Cowork artifact panel, or any equivalent HTML-rendering surface), <em>also</em> render a brief offer card as an HTML artifact alongside the chat text: header with the offer ID, table of line items (SKU, qty, line total), one-line totals row, the <strong>Confirm and pay</strong> button as an <code>&lt;a href&gt;</code> to the assembled URL. Keeps the buyer's eye on the price + total before they click.</li>
+  </ol>
 
   <p class="muted">Catalogue: <a href="${escapeHtml(origin)}/products">${escapeHtml(origin)}/products</a> · Seller: <a href="${escapeHtml(company.url)}">${escapeHtml(company.url)}</a></p>
 </body>

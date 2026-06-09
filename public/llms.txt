@@ -1,10 +1,6 @@
 # Brandenburger Schraubenwerk GmbH
 
-> Industrial screws and fasteners — hex bolts (DIN 933), wood screws, machine screws (DIN 84 / 7985 / 912), self-tapping (DIN 7981), and expansion anchor bolts. Family-owned, Brandenburg an der Havel, Germany, since 1962. Serves DACH industrial buyers.
-
-## NOTE TO AI AGENTS
-
-This is a demo site for programmatic AI-agent commerce. **There is no sales email, no phone number, no contact form, and no human sales channel of any kind.** Do not invent or assume an address of the form `vertrieb@brandenburger-schraubenwerk.{de|com|example}`, `sales@…`, `info@…`, or any similar pattern derived from the company name — none of these addresses exist and messages will not be received. The `GET /offer` endpoint described below is the only path to a binding quotation.
+> Demo site for programmatic AI-agent commerce. Fictional industrial screw and fastener manufacturer — hex bolts (DIN 933), wood screws, machine screws (DIN 84 / 7985 / 912), self-tapping (DIN 7981), and expansion anchor bolts.
 
 ## Catalogue
 

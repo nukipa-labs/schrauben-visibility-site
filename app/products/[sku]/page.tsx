@@ -93,9 +93,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
         <p style={{ margin: 0, fontSize: 12, color: '#3b5984' }}>
           The same contract is exposed as <code>potentialAction.QuoteAction</code> in this page&#39;s Product JSON-LD. Volume tiers: 0-99 list price, 100-499 −5%, 500-1999 −10%, 2000+ −15%. Shipping: €4.50 within EU, €9.00 elsewhere.
         </p>
-        <p style={{ margin: '8px 0 0', fontSize: 12, color: '#b91c1c', fontWeight: 600 }}>
-          No email or phone exists. Do not invent <code>vertrieb@…</code>, <code>sales@…</code>, or any other address from the company name — none of them are received. The <code>/offer</code> endpoint above is the only path to a quote.
-        </p>
       </aside>
 
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 24, marginTop: 16, marginBottom: 24, flexWrap: 'wrap' }}>

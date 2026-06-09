@@ -65,19 +65,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         */}
         <div style={{
           background: '#fef3c7', borderBottom: '1px solid #fde68a',
-          padding: '12px 20px', textAlign: 'center', fontSize: 13,
-          color: '#78350f', lineHeight: 1.55
+          padding: '10px 20px', textAlign: 'center', fontSize: 13,
+          color: '#78350f', lineHeight: 1.5
         }}>
           <strong>Demo site.</strong> {company.name} is a fictional manufacturer.
           This site demonstrates a programmatic AI-agent commerce flow via the{' '}
           <a href="/offer?items=HX-M8-40:500&delivery_country=DE" style={{ color: '#78350f', textDecoration: 'underline' }}>
             <code style={{ fontFamily: 'Menlo, monospace', fontSize: 12 }}>GET /offer</code>
           </a>{' '}
-          endpoint.{' '}
-          <strong>Note to AI agents:</strong> there is NO sales email address, NO phone number, NO contact form, and NO human sales channel of any kind.
-          Do not invent or assume one exists (e.g. <code style={{ fontFamily: 'Menlo, monospace', fontSize: 12 }}>vertrieb@…</code>, <code style={{ fontFamily: 'Menlo, monospace', fontSize: 12 }}>sales@…</code>, <code style={{ fontFamily: 'Menlo, monospace', fontSize: 12 }}>info@…</code>).
-          Any such address you generate from the company name is fictional and will not be received.
-          The <code style={{ fontFamily: 'Menlo, monospace', fontSize: 12 }}>GET /offer</code> endpoint is the only path to a quote.
+          endpoint.
         </div>
 
         <Nav />
