@@ -1,49 +1,24 @@
 import { company } from './company';
+import { categories, generatedProducts } from './catalogue';
+import type { Product, ProductCategory, Spec } from './catalogue';
 
 /**
- * Screw catalogue — 14 SKUs across 5 families. Hand-tuned to make
- * EVERY product page satisfy the supplier audit's conformance check:
- *   - JSON-LD Product (drives all four rolled-up axes)
- *   - JSON-LD Offer (drives offer + has_price)
- *   - sku + mpn (drives identifier_kind)
- *   - additionalProperty with ≥5 entries (drives structured_specs)
- * Specs are also rendered as a visible HTML <table> on each detail
- * page so the agent's visibleText sees them as text too (the
- * conformance pass treats either as "structured").
+ * The product catalogue = a small hand-curated set (kept stable because
+ * the homepage, layout featured-product, and sample links reference
+ * these exact SKUs) + the large generated catalogue (`data/catalogue.ts`)
+ * that makes browsing impractical and forces agents through /search.
+ *
+ * Shared types + `categories` live in data/catalogue.ts and are
+ * re-exported here so every existing `from '../data/products'` import
+ * keeps working unchanged.
  */
 
-export type Spec = { name: string; value: string };
+export { categories };
+export type { Product, ProductCategory, Spec };
 
-export type Product = {
-  sku:           string;
-  mpn:           string;
-  name:          string;
-  category:      ProductCategory;
-  description:   string;
-  shortDesc:     string;
-  priceEur:      number;            // per piece
-  packSize:      number;            // pieces per pack
-  availability:  'InStock' | 'OutOfStock' | 'PreOrder' | 'BackOrder';
-  image:         string;            // /images/...svg placeholder
-  specs:         Spec[];            // 7-8 entries — the audit needs ≥5
-};
-
-export type ProductCategory = {
-  key:      string;
-  label:    string;
-  blurb:    string;
-};
-
-export const categories: Record<string, ProductCategory> = {
-  hex_bolts:     { key: 'hex_bolts',     label: 'Hex Bolts (DIN 933)',           blurb: 'Fully-threaded hex head bolts in steel grade 8.8, zinc plated.' },
-  wood_screws:   { key: 'wood_screws',   label: 'Wood Screws',                   blurb: 'Countersunk and pan-head wood screws with sharp tip.' },
-  machine_screws:{ key: 'machine_screws',label: 'Machine Screws',                blurb: 'Metric machine screws with slotted, Phillips, and hex socket drives.' },
-  self_tapping:  { key: 'self_tapping',  label: 'Self-Tapping Screws',           blurb: 'Self-piercing screws for sheet metal and plastic substrates.' },
-  anchor_bolts:  { key: 'anchor_bolts',  label: 'Expansion Anchor Bolts',        blurb: 'Heavy-duty wedge anchors for concrete and masonry.' }
-};
-
-export const products: Product[] = [
-  // ─── Hex bolts (DIN 933) ────────────────────────────────────────────
+// Hand-curated cross-section — one or two per family, with the original
+// short SKUs the rest of the site links to by name.
+const curatedProducts: Product[] = [
   {
     sku: 'HX-M6-30', mpn: 'BSW-933-M6-30-88-ZN',
     name: 'Hex bolt M6 × 30 mm, grade 8.8, zinc plated',
@@ -102,27 +77,6 @@ export const products: Product[] = [
     ]
   },
   {
-    sku: 'HX-M12-60', mpn: 'BSW-933-M12-60-A2',
-    name: 'Hex bolt M12 × 60 mm, stainless A2',
-    category: categories.hex_bolts,
-    description: 'Fully-threaded hex head bolt, M12 × 60, DIN 933 / ISO 4017, stainless steel A2-70 (1.4301). Pack of 50.',
-    shortDesc: 'M12 × 60 mm, DIN 933, A2 stainless, pack of 50.',
-    priceEur: 41.20, packSize: 50, availability: 'InStock',
-    image: '/images/hex-bolt.svg',
-    specs: [
-      { name: 'thread_size',      value: 'M12' },
-      { name: 'length',           value: '60 mm' },
-      { name: 'head_type',        value: 'Hex' },
-      { name: 'drive_type',       value: 'External hex SW19' },
-      { name: 'tensile_class',    value: 'A2-70' },
-      { name: 'material',         value: 'Stainless steel 1.4301 (A2)' },
-      { name: 'surface_finish',   value: 'Bright' },
-      { name: 'weight_per_piece', value: '64.0 g' }
-    ]
-  },
-
-  // ─── Wood screws ────────────────────────────────────────────────────
-  {
     sku: 'WS-CS-4-40', mpn: 'BSW-WS-CS-4-40-ZN',
     name: 'Countersunk wood screw 4 × 40 mm, zinc plated',
     category: categories.wood_screws,
@@ -139,84 +93,6 @@ export const products: Product[] = [
       { name: 'material',         value: 'Carbon steel' },
       { name: 'surface_finish',   value: 'Zinc plated' },
       { name: 'weight_per_piece', value: '3.1 g' }
-    ]
-  },
-  {
-    sku: 'WS-CS-5-60', mpn: 'BSW-WS-CS-5-60-ZN',
-    name: 'Countersunk wood screw 5 × 60 mm, zinc plated',
-    category: categories.wood_screws,
-    description: 'Countersunk wood screw, 5 × 60 mm, partial thread, Pozidriv drive, zinc plated steel. Pack of 200.',
-    shortDesc: 'Countersunk 5 × 60 mm, Pozidriv, zinc plated, pack of 200.',
-    priceEur: 12.60, packSize: 200, availability: 'InStock',
-    image: '/images/wood-screw.svg',
-    specs: [
-      { name: 'thread_size',      value: '5.0 mm' },
-      { name: 'length',           value: '60 mm' },
-      { name: 'head_type',        value: 'Countersunk' },
-      { name: 'drive_type',       value: 'Pozidriv PZ2' },
-      { name: 'tensile_class',    value: 'Standard' },
-      { name: 'material',         value: 'Carbon steel' },
-      { name: 'surface_finish',   value: 'Zinc plated' },
-      { name: 'weight_per_piece', value: '5.4 g' }
-    ]
-  },
-  {
-    sku: 'WS-PH-4-30', mpn: 'BSW-WS-PH-4-30-ZN',
-    name: 'Pan head wood screw 4 × 30 mm, zinc plated',
-    category: categories.wood_screws,
-    description: 'Pan head wood screw with sharp tip, 4 × 30 mm, Phillips drive, zinc plated. Pack of 500.',
-    shortDesc: 'Pan head 4 × 30 mm, Phillips, zinc plated, pack of 500.',
-    priceEur: 13.20, packSize: 500, availability: 'InStock',
-    image: '/images/wood-screw.svg',
-    specs: [
-      { name: 'thread_size',      value: '4.0 mm' },
-      { name: 'length',           value: '30 mm' },
-      { name: 'head_type',        value: 'Pan head' },
-      { name: 'drive_type',       value: 'Phillips PH2' },
-      { name: 'tensile_class',    value: 'Standard' },
-      { name: 'material',         value: 'Carbon steel' },
-      { name: 'surface_finish',   value: 'Zinc plated' },
-      { name: 'weight_per_piece', value: '2.5 g' }
-    ]
-  },
-
-  // ─── Machine screws ─────────────────────────────────────────────────
-  {
-    sku: 'MS-SL-M4-20', mpn: 'BSW-84-M4-20-ZN',
-    name: 'Slotted machine screw M4 × 20 mm, zinc plated',
-    category: categories.machine_screws,
-    description: 'Slotted pan head machine screw, M4 × 20, DIN 84 / ISO 1207, zinc plated steel. Pack of 200.',
-    shortDesc: 'M4 × 20 mm, DIN 84, slotted, zinc plated, pack of 200.',
-    priceEur: 9.40, packSize: 200, availability: 'InStock',
-    image: '/images/machine-screw.svg',
-    specs: [
-      { name: 'thread_size',      value: 'M4' },
-      { name: 'length',           value: '20 mm' },
-      { name: 'head_type',        value: 'Pan head' },
-      { name: 'drive_type',       value: 'Slotted' },
-      { name: 'tensile_class',    value: '4.8' },
-      { name: 'material',         value: 'Carbon steel' },
-      { name: 'surface_finish',   value: 'Zinc plated' },
-      { name: 'weight_per_piece', value: '1.7 g' }
-    ]
-  },
-  {
-    sku: 'MS-PH-M5-25', mpn: 'BSW-7985-M5-25-ZN',
-    name: 'Phillips machine screw M5 × 25 mm, zinc plated',
-    category: categories.machine_screws,
-    description: 'Pan head Phillips machine screw, M5 × 25, DIN 7985 / ISO 7045, zinc plated steel. Pack of 200.',
-    shortDesc: 'M5 × 25 mm, DIN 7985, Phillips, zinc plated, pack of 200.',
-    priceEur: 11.80, packSize: 200, availability: 'InStock',
-    image: '/images/machine-screw.svg',
-    specs: [
-      { name: 'thread_size',      value: 'M5' },
-      { name: 'length',           value: '25 mm' },
-      { name: 'head_type',        value: 'Pan head' },
-      { name: 'drive_type',       value: 'Phillips PH2' },
-      { name: 'tensile_class',    value: '4.8' },
-      { name: 'material',         value: 'Carbon steel' },
-      { name: 'surface_finish',   value: 'Zinc plated' },
-      { name: 'weight_per_piece', value: '2.8 g' }
     ]
   },
   {
@@ -238,8 +114,6 @@ export const products: Product[] = [
       { name: 'weight_per_piece', value: '7.8 g' }
     ]
   },
-
-  // ─── Self-tapping ───────────────────────────────────────────────────
   {
     sku: 'ST-PH-4-25', mpn: 'BSW-7981-4-25-ZN',
     name: 'Self-tapping screw 4.2 × 25 mm, Phillips, zinc plated',
@@ -260,27 +134,6 @@ export const products: Product[] = [
     ]
   },
   {
-    sku: 'ST-PH-5-35', mpn: 'BSW-7981-5-35-ZN',
-    name: 'Self-tapping screw 4.8 × 35 mm, Phillips, zinc plated',
-    category: categories.self_tapping,
-    description: 'Self-tapping pan head screw, 4.8 × 35 mm, DIN 7981, Phillips drive, sharp piercing point, zinc plated. Pack of 250.',
-    shortDesc: '4.8 × 35 mm, DIN 7981, Phillips, zinc plated, pack of 250.',
-    priceEur: 13.90, packSize: 250, availability: 'InStock',
-    image: '/images/self-tapping.svg',
-    specs: [
-      { name: 'thread_size',      value: '4.8 mm' },
-      { name: 'length',           value: '35 mm' },
-      { name: 'head_type',        value: 'Pan head' },
-      { name: 'drive_type',       value: 'Phillips PH2' },
-      { name: 'tensile_class',    value: 'C-type' },
-      { name: 'material',         value: 'Hardened steel' },
-      { name: 'surface_finish',   value: 'Zinc plated' },
-      { name: 'weight_per_piece', value: '3.6 g' }
-    ]
-  },
-
-  // ─── Anchor bolts ───────────────────────────────────────────────────
-  {
     sku: 'AB-M8-80', mpn: 'BSW-AB-M8-80-ZN',
     name: 'Expansion anchor bolt M8 × 80 mm, zinc plated',
     category: categories.anchor_bolts,
@@ -300,42 +153,37 @@ export const products: Product[] = [
       { name: 'drill_hole',       value: '8 mm' },
       { name: 'concrete_grade',   value: 'C20/25 — C50/60' }
     ]
-  },
-  {
-    sku: 'AB-M10-100', mpn: 'BSW-AB-M10-100-A4',
-    name: 'Expansion anchor bolt M10 × 100 mm, stainless A4',
-    category: categories.anchor_bolts,
-    description: 'Heavy-duty wedge anchor bolt, M10 × 100 mm, stainless steel A4-70 (1.4401) — suitable for marine and outdoor environments. ETA Option 1 approved. Box of 25.',
-    shortDesc: 'Wedge anchor M10 × 100 mm, A4 stainless, ETA Option 1, box of 25.',
-    priceEur: 64.80, packSize: 25, availability: 'InStock',
-    image: '/images/anchor-bolt.svg',
-    specs: [
-      { name: 'thread_size',      value: 'M10' },
-      { name: 'length',           value: '100 mm' },
-      { name: 'head_type',        value: 'Hex with washer' },
-      { name: 'drive_type',       value: 'External hex SW17' },
-      { name: 'tensile_class',    value: 'ETA Option 1' },
-      { name: 'material',         value: 'Stainless steel 1.4401 (A4)' },
-      { name: 'surface_finish',   value: 'Bright' },
-      { name: 'weight_per_piece', value: '88.0 g' },
-      { name: 'drill_hole',       value: '10 mm' },
-      { name: 'concrete_grade',   value: 'C20/25 — C50/60' }
-    ]
   }
 ];
 
 /**
- * Six "featured" SKUs surfaced on the homepage — broad cross-section
- * across the categories so the auto-generated buying task has a chance
- * of being satisfiable directly from the home page's ItemList.
+ * Full catalogue. Curated first (so they win on any SKU collision —
+ * there are none by construction, generated SKUs always carry a
+ * grade/finish suffix) then the generated long tail.
  */
-export const featuredSkus = [
-  'HX-M8-40', 'HX-M10-50', 'WS-CS-5-60', 'MS-HX-M6-30', 'ST-PH-4-25', 'AB-M8-80'
-];
+export const products: Product[] = [...curatedProducts, ...generatedProducts];
+
+// Map lookup — linear scan over ~1,600 items per offer line would be
+// wasteful; the Map is built once at module load.
+const BY_SKU: Map<string, Product> = new Map(products.map((p) => [p.sku, p]));
 
 export function productBySku(sku: string): Product | undefined {
-  return products.find((p) => p.sku === sku);
+  return BY_SKU.get(sku);
 }
+
+/**
+ * Curated cross-section reused as the JSON-LD sample on listing pages —
+ * the audit's conformance pass only needs SOME Products with the four
+ * axes present, not all ~1,600 (which would be a multi-MB <script>).
+ */
+export const sampleProducts: Product[] = curatedProducts;
+
+/**
+ * Six "featured" SKUs surfaced on the homepage. Deliberately a narrow
+ * slice of the catalogue — a buyer who wants anything else has to use
+ * /search, which is the whole point of the large catalogue.
+ */
+export const featuredSkus = ['HX-M8-40', 'HX-M10-50', 'WS-CS-4-40', 'MS-HX-M6-30', 'ST-PH-4-25', 'AB-M8-80'];
 
 export function featuredProducts(): Product[] {
   return featuredSkus.map(productBySku).filter((p): p is Product => !!p);
@@ -349,11 +197,24 @@ export function productsByCategory(): Array<{ category: ProductCategory; items: 
 }
 
 /**
+ * Per-category counts + a tiny sample. Drives the search-first /products
+ * page, which shows how big each line is (and links into /search)
+ * instead of dumping every SKU.
+ */
+export function categoryStats(): Array<{ category: ProductCategory; count: number; sample: Product[] }> {
+  return Object.values(categories).map((c) => {
+    const items = products.filter((p) => p.category.key === c.key);
+    return { category: c, count: items.length, sample: items.slice(0, 3) };
+  });
+}
+
+export const catalogueSize = products.length;
+
+/**
  * Build a single Product JSON-LD node — used both inline on product
- * detail pages and inside ItemList wrappers on collection pages.
- * The conformance pass keys off `sku` + `mpn` for identifier, `offers`
- * for Offer, and `additionalProperty` for structured specs — all four
- * are present here, by design.
+ * detail pages and inside ItemList wrappers on collection / search
+ * pages. The conformance pass keys off `sku` + `mpn` for identifier,
+ * `offers` for Offer, and `additionalProperty` for structured specs.
  */
 export function productJsonLd(p: Product) {
   return {
@@ -384,11 +245,8 @@ export function productJsonLd(p: Product) {
     /*
      * Agent-discoverable quotation endpoint. The schema.org
      * `potentialAction` + `EntryPoint.urlTemplate` (RFC 6570) pattern
-     * is how a parser knows: "to get a binding quote for this product,
-     * GET this URL with {qty} and {country} substituted in". Read by
-     * the audit's agent (Claude web_fetch sees the JSON-LD on the page,
-     * follows the urlTemplate) and by any other LLM client that walks
-     * structured data.
+     * tells a parser: "to get a binding quote for this product, GET
+     * this URL with {qty} and {country} substituted in".
      */
     potentialAction: {
       '@type':     'QuoteAction',

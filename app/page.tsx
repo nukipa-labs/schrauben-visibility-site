@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { JsonLd } from '../components/JsonLd';
 import { company } from '../data/company';
-import { featuredProducts, productJsonLd, categories } from '../data/products';
+import { featuredProducts, productJsonLd, categories, catalogueSize } from '../data/products';
 
 export default function HomePage() {
   const featured = featuredProducts();
@@ -49,13 +49,26 @@ export default function HomePage() {
           {company.tagline}
         </h1>
         <p style={{ fontSize: 18, color: '#5a5a5a', lineHeight: 1.55, maxWidth: 680, margin: 0 }}>
-          Industrial-grade hex bolts, wood screws, machine screws, self-tapping screws,
-          and expansion anchor bolts — produced in Brandenburg an der Havel, shipped across the DACH region.
+          A {catalogueSize.toLocaleString()}-SKU catalogue of industrial hex bolts, machine screws, wood screws,
+          self-tapping screws, and expansion anchors — produced in Brandenburg an der Havel, shipped across the DACH region.
         </p>
-        <div style={{ marginTop: 20, display: 'flex', gap: 12 }}>
+
+        {/* Search-first hero. The catalogue is too large to browse, so the
+            primary action is a search box (real GET to /search). */}
+        <form action="/search" method="get" style={{ marginTop: 20, display: 'flex', gap: 10, flexWrap: 'wrap', maxWidth: 620 }}>
+          <input
+            name="q" type="text" placeholder="Search the catalogue — e.g. M10 hex bolt stainless A4"
+            style={{ flex: '1 1 280px', minWidth: 0, padding: '13px 18px', borderRadius: 999, border: '1px solid #e2ddd9', background: '#fff', color: '#1a1a1a', fontSize: 15, outline: 'none' }}
+          />
+          <button type="submit" style={{ padding: '13px 26px', borderRadius: 999, border: 'none', background: '#0054C9', color: '#fff', fontSize: 15, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+            Search
+          </button>
+        </form>
+
+        <div style={{ marginTop: 14, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           <Link href="/products"
-                style={{ display: 'inline-block', padding: '12px 24px', background: '#0054C9', color: '#fff', borderRadius: 8, textDecoration: 'none', fontWeight: 600 }}>
-            Browse the catalogue
+                style={{ display: 'inline-block', padding: '12px 24px', background: '#fff', color: '#0054C9', borderRadius: 8, textDecoration: 'none', fontWeight: 600, border: '1px solid #0054C9' }}>
+            Browse by family
           </Link>
           <Link href="/offer?items=HX-M8-40:500&delivery_country=DE"
                 style={{ display: 'inline-block', padding: '12px 24px', background: '#fff', color: '#0054C9', borderRadius: 8, textDecoration: 'none', fontWeight: 600, border: '1px solid #0054C9' }}>
@@ -69,7 +82,7 @@ export default function HomePage() {
         <h2 style={{ fontSize: 22, margin: '0 0 16px' }}>What we make</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
           {Object.values(categories).map((c) => (
-            <Link key={c.key} href="/products" className="card" style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+            <Link key={c.key} href={`/search?category=${encodeURIComponent(c.key)}`} className="card" style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
               <div style={{ fontWeight: 600, marginBottom: 6 }}>{c.label}</div>
               <div className="muted" style={{ fontSize: 13, lineHeight: 1.55 }}>{c.blurb}</div>
             </Link>
@@ -127,9 +140,10 @@ export default function HomePage() {
             </div>
           </div>
           <div className="card">
-            <div style={{ fontWeight: 600, marginBottom: 6 }}>Volume pricing</div>
+            <div style={{ fontWeight: 600, marginBottom: 6 }}>Searchable catalogue</div>
             <div className="muted" style={{ fontSize: 13, lineHeight: 1.55 }}>
-              Pack sizes from 25 to 500 pieces. Bulk pricing tiers available — request a quote for &gt; 1,000 units.
+              {catalogueSize.toLocaleString()} SKUs, searchable by thread, length, grade, material and finish — flat,
+              transparent per-pack pricing on every one.
             </div>
           </div>
         </div>

@@ -4,16 +4,12 @@
 
 ## Catalogue
 
-- [Full product catalogue](/products): 14 SKUs across 5 product families with price, identifier (SKU + MPN), specs, and availability for each. Best entry point if you need to find a part.
-- [Hex Bolts (DIN 933)](/products#hex_bolts): M6 through M12, grade 8.8 and stainless A2.
-- [Wood screws](/products#wood_screws): countersunk and pan head, Phillips and Pozidriv.
-- [Machine screws](/products#machine_screws): slotted, Phillips, and hex socket cap, grades 4.8 and 12.9.
-- [Self-tapping screws](/products#self_tapping): DIN 7981, Phillips drive.
-- [Expansion anchor bolts](/products#anchor_bolts): ETA Option 1 approved, M8 and M10.
+The catalogue holds well over a thousand SKUs across five families (hex bolts, machine screws, wood screws, self-tapping screws, expansion anchor bolts) in many thread/length/grade/material combinations — too many to list or browse page by page. **Use the search endpoint to find a part, then the offer endpoint to order it.** The homepage shows only a handful of featured items; everything else is reachable only via search.
 
 ## Programmatic interfaces
 
-- [Get a binding quotation (multi-line)](/offer?items=SKU1:qty1,SKU2:qty2&delivery_country={country}): GET endpoint. Returns an HTML offer document with per-line price breakdown, one shipping charge, and the grand total. Flat per-piece pricing — no volume discounts. Shipping: €4.50 within EU, €9.00 elsewhere. Example: `/offer?items=HX-M8-40:500,HX-M10-50:300&delivery_country=DE`. Up to 20 line items per offer.
+- [Search the catalogue](/search?thread={thread}&length={mm}&grade={grade}&material={material}&category={family}&q={text}): GET endpoint. Returns an HTML page (and JSON-LD `ItemList`) of matching SKUs with their specs and per-pack price. All params optional and ANDed; `q` is free-text. Parameters: `q`, `category`, `thread` (e.g. `M8` or `4.0`), `length` (exact `40` or range `30-60`), `head`, `drive`, `material`, `grade`, `finish`, `min_price`, `max_price`, `limit` (default 25, max 100). Call `/search` with no params to get the full parameter list and the valid values for each. Examples: `/search?thread=M8&grade=8.8&category=hex`, `/search?q=stainless+countersunk+wood&length=40-60`, `/search?category=anchor&material=A4`.
+- [Get a binding quotation (multi-line)](/offer?items=SKU1:qty1,SKU2:qty2&delivery_country={country}): GET endpoint. Returns an HTML offer document with per-line price breakdown, one shipping charge, and the grand total. Flat per-piece pricing — no volume discounts. Shipping: €4.50 within EU, €9.00 elsewhere. Example: `/offer?items=HX-M8-40:500,HX-M10-50:300&delivery_country=DE`. Up to 20 line items per offer. Take SKUs from `/search` results.
 - [Get a binding quotation (single SKU shorthand)](/offer?sku={sku}&qty={qty}&delivery_country={country}): GET endpoint. Same as above but for one SKU; convenience shorthand. Example: `/offer?sku=HX-M8-40&qty=500&delivery_country=DE`. The same contract is published as schema.org `Product.potentialAction` (`@type: QuoteAction`) inside each product's JSON-LD.
 - [Confirm and pay](/offer/confirm?offer_id=...&items=SKU:qty,SKU:qty&delivery_country=...&total_eur=...&currency=EUR&valid_until_iso=...&street={street}&postal={postal}&city={city}&buyer_name={buyer_name}&buyer_email={buyer_email}&payment_method={invoice_net30|sepa_direct_debit|credit_card}): GET endpoint. The offer response includes the exact URL template above with the locked fields (offer_id, items, country, total) pre-filled and the buyer-supplied fields as placeholders. An AI agent collects the buyer's address + contact + payment method, URL-encodes them, assembles the URL, and presents it to the buyer as a clickable link. The buyer sees a summary and pays — the agent itself does not submit the URL.
 

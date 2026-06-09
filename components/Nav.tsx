@@ -17,6 +17,7 @@ export function Nav() {
         {company.shortName}
       </Link>
       <div style={{ display: 'flex', gap: 24 }}>
+        <Link href="/search"   style={navLink}>Search</Link>
         <Link href="/products" style={navLink}>Products</Link>
         <Link href="/about"    style={navLink}>About</Link>
         <Link href="/contact"  style={navLink}>Contact</Link>

@@ -3,12 +3,17 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { JsonLd } from '../../../components/JsonLd';
 import { company } from '../../../data/company';
-import { products, productBySku, productJsonLd } from '../../../data/products';
+import { sampleProducts, productBySku, productJsonLd } from '../../../data/products';
 
 interface PageProps { params: Promise<{ sku: string }> }
 
+// Only the curated SKUs are pre-rendered at build time — pre-building
+// all ~1,600 generated detail pages would bloat the build for pages an
+// agent reaches via /search anyway. The long tail renders on demand
+// (Next's default dynamicParams = true), still fully server-rendered
+// with the same JSON-LD + specs.
 export function generateStaticParams() {
-  return products.map((p) => ({ sku: p.sku }));
+  return sampleProducts.map((p) => ({ sku: p.sku }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
