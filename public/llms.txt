@@ -11,11 +11,6 @@
 - [Self-tapping screws](/products#self_tapping): DIN 7981, Phillips drive.
 - [Expansion anchor bolts](/products#anchor_bolts): ETA Option 1 approved, M8 and M10.
 
-## Programmatic interfaces
-
-- [MCP server-card](/.well-known/mcp/server-card.json): describes a Model Context Protocol server at `/api/mcp` exposing one tool, `create_offer(sku, quantity, delivery_country?)`. The tool returns a binding quotation with volume-tier discounts, shipping cost, delivery estimate, payment + delivery terms, validity window, and an accept URL. Volume tiers: 0-99 list, 100-499 −5%, 500-1999 −10%, 2000+ −15%. Use this once you have selected a candidate SKU.
-- [MCP endpoint](/api/mcp): the JSON-RPC 2.0 Streamable HTTP endpoint described by the server-card above. Protocol revisions 2025-03-26 and 2025-11-25 supported.
-
 ## Contact
 
 - [About](/about): company background, certifications, standards we comply with.

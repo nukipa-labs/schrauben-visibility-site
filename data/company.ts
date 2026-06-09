@@ -6,10 +6,7 @@ export const company = {
   name:       'Brandenburger Schraubenwerk GmbH',
   legalName:  'Brandenburger Schraubenwerk GmbH',
   shortName:  'Brandenburger Schraubenwerk',
-  // The deployed origin. Every JSON-LD self-reference resolves to this
-  // URL; the offer's accept_url is built off it (with a per-request
-  // override in app/api/mcp/route.ts so it tracks whichever host the
-  // MCP call came in on — works for localhost dev + the public host).
+  // The deployed origin. Every JSON-LD self-reference resolves to this URL.
   url:        'https://schrauben-visibility.sites.nukipa.io',
   logo:       '/logo.svg',
   tagline:    'Präzision in jedem Gewinde.',
