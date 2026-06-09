@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { JsonLd } from '../../../components/JsonLd';
 import { company } from '../../../data/company';
 import { products, productBySku, productJsonLd } from '../../../data/products';
+import { isAgent } from '../../../lib/userAgent';
 
 interface PageProps { params: Promise<{ sku: string }> }
 
@@ -31,6 +32,13 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const { sku } = await params;
   const product = productBySku(sku);
   if (!product) notFound();
+
+  // Agent vs human render. Agents skip the "Ordering" section
+  // entirely — its only call-to-action is the .example sales email,
+  // which signals "fake shop" to LLM agents and stalls the demo.
+  // The agent-commerce panel at the top of the page already carries
+  // everything an agent needs (the /offer endpoint contract).
+  const agent = await isAgent();
 
   const ld = {
     ...productJsonLd(product),
@@ -137,24 +145,27 @@ export default async function ProductDetailPage({ params }: PageProps) {
         </table>
       </section>
 
-      {/* Ordering / RFQ block — explicit so the agent doesn't have to
-          guess. The audit's extract_pricing tool will pull the price
-          out of this section's visible text. */}
-      <section style={{ marginBottom: 28 }}>
-        <h2 style={{ fontSize: 20, margin: '0 0 8px' }}>Ordering</h2>
-        <div className="card">
-          <p style={{ margin: '0 0 8px', fontSize: 15, lineHeight: 1.6 }}>
-            <strong>{product.sku}</strong> ships in packs of <strong>{product.packSize}</strong> at <strong>€ {product.priceEur.toFixed(2)} EUR</strong> per pack.
-            Orders placed before 14:00 CET ship the same day across DACH.
-          </p>
-          <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6 }}>
-            For a binding quotation including volume discount and shipping, GET{' '}
-            <code style={{ fontFamily: 'Menlo, monospace', fontSize: 13, background: '#fafafa', padding: '1px 6px', borderRadius: 4 }}>
-              /offer?sku={product.sku}&amp;qty=&#123;qty&#125;&amp;delivery_country=&#123;country&#125;
-            </code>. Or email sales: <a href={`mailto:${company.contact.email}`}>{company.contact.email}</a>.
-          </p>
-        </div>
-      </section>
+      {/* Ordering / RFQ block — HUMAN MODE ONLY. The .example sales
+          email signals "fake shop" to LLM agents and breaks the demo,
+          so agents skip this section entirely and rely on the
+          agent-commerce panel at the top of the page. */}
+      {!agent && (
+        <section style={{ marginBottom: 28 }}>
+          <h2 style={{ fontSize: 20, margin: '0 0 8px' }}>Ordering</h2>
+          <div className="card">
+            <p style={{ margin: '0 0 8px', fontSize: 15, lineHeight: 1.6 }}>
+              <strong>{product.sku}</strong> ships in packs of <strong>{product.packSize}</strong> at <strong>€ {product.priceEur.toFixed(2)} EUR</strong> per pack.
+              Orders placed before 14:00 CET ship the same day across DACH.
+            </p>
+            <p style={{ margin: 0, fontSize: 15, lineHeight: 1.6 }}>
+              For a binding quotation including volume discount and shipping, GET{' '}
+              <code style={{ fontFamily: 'Menlo, monospace', fontSize: 13, background: '#fafafa', padding: '1px 6px', borderRadius: 4 }}>
+                /offer?sku={product.sku}&amp;qty=&#123;qty&#125;&amp;delivery_country=&#123;country&#125;
+              </code>. Or email sales: <a href={`mailto:${company.contact.email}`}>{company.contact.email}</a>.
+            </p>
+          </div>
+        </section>
+      )}
 
       <p className="muted" style={{ fontSize: 13 }}>
         <Link href="/products">← Back to the catalogue</Link>

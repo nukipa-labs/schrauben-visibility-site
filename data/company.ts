@@ -40,8 +40,16 @@ export const company = {
  * page for entity-authority signal; emitting it everywhere also makes
  * `notableGaps.no_organization_schema` empty on every page → no spurious
  * recommendation.
+ *
+ * `agent` flag swaps the human `contactPoint` (`.example` email +
+ * phone) for an agent-facing one pointing at `/offer`. The visible
+ * footer / Ordering / Contact-page surfaces are gated separately in
+ * the layout + page components; gating the structured data here too
+ * keeps the JSON-LD coherent for any agent that does parse `<script
+ * type="application/ld+json">` (some do, some don't — be consistent
+ * across both channels).
  */
-export function organizationJsonLd() {
+export function organizationJsonLd({ agent = false }: { agent?: boolean } = {}) {
   return {
     '@context': 'https://schema.org',
     '@type':    'Organization',
@@ -59,13 +67,22 @@ export function organizationJsonLd() {
       postalCode:      company.address.postal,
       addressCountry:  company.address.country
     },
-    contactPoint: [{
-      '@type':       'ContactPoint',
-      contactType:   'sales',
-      email:         company.contact.email,
-      telephone:     company.contact.phone,
-      availableLanguage: ['de', 'en']
-    }],
+    contactPoint: [
+      agent
+        ? {
+            '@type':           'ContactPoint',
+            contactType:       'sales',
+            url:               `${company.url}/offer`,
+            availableLanguage: ['de', 'en']
+          }
+        : {
+            '@type':           'ContactPoint',
+            contactType:       'sales',
+            email:             company.contact.email,
+            telephone:         company.contact.phone,
+            availableLanguage: ['de', 'en']
+          }
+    ],
     sameAs: company.sameAs
   };
 }

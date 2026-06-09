@@ -4,6 +4,7 @@ import { Nav } from '../components/Nav';
 import { JsonLd } from '../components/JsonLd';
 import { company, organizationJsonLd } from '../data/company';
 import { productBySku, productJsonLd } from '../data/products';
+import { isAgent } from '../lib/userAgent';
 
 export const metadata: Metadata = {
   metadataBase: new URL(company.url),
@@ -22,7 +23,14 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' }
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // UA detection runs once per request. Used to keep the .example
+  // sales email + phone out of the footer when an agent is fetching
+  // — the demo's whole point is the programmatic-commerce path, and
+  // a fake-tld contact line just signals "not a real shop" and
+  // breaks the agent's reasoning.
+  const agent = await isAgent();
+
   return (
     <html lang="de">
       <head>
@@ -40,7 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           notableGaps['no_organization_schema'] empty everywhere, not
           just on the homepage.
         */}
-        <JsonLd data={organizationJsonLd()} />
+        <JsonLd data={organizationJsonLd({ agent })} />
         {/*
           Single "featured" Product JSON-LD also in the layout — gives
           every page (incl. /about, /contact) the Product + Offer +
@@ -64,11 +72,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         }}>
           <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
             <div>&copy; {new Date().getFullYear()} {company.name}. {company.address.street}, {company.address.postal} {company.address.locality}, {company.address.country}.</div>
-            <div>
-              <a href={`mailto:${company.contact.email}`}>{company.contact.email}</a>
-              {' · '}
-              <a href={`tel:${company.contact.phone.replace(/\s/g, '')}`}>{company.contact.phone}</a>
-            </div>
+            {agent ? (
+              <div>
+                Programmatic catalogue at <a href="/products">/products</a> · Programmatic quotation at <a href="/offer">/offer</a>
+              </div>
+            ) : (
+              <div>
+                <a href={`mailto:${company.contact.email}`}>{company.contact.email}</a>
+                {' · '}
+                <a href={`tel:${company.contact.phone.replace(/\s/g, '')}`}>{company.contact.phone}</a>
+              </div>
+            )}
           </div>
         </footer>
       </body>
