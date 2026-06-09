@@ -17,11 +17,6 @@ const LINK_HEADER = '</llms.txt>; rel="describedby"; type="text/markdown"';
 export function middleware(_req: NextRequest) {
   const res = NextResponse.next();
   res.headers.set('Link', LINK_HEADER);
-  // Pages render differently for AI-agent vs. human user agents
-  // (see lib/userAgent.ts). Append to Vary so the framework's
-  // own RSC/router Vary tokens stay intact while we add User-Agent —
-  // setting it would lose them.
-  res.headers.append('Vary', 'User-Agent');
   return res;
 }
 

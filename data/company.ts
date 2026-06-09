@@ -1,6 +1,12 @@
 /**
  * Static company profile. Drives the Organization JSON-LD on every page
- * (via the root layout) plus the footer + about copy. Fictional.
+ * (via the root layout) plus the footer + about copy.
+ *
+ * Fictional. This site is a demo of programmatic AI-agent commerce —
+ * the human contact surface (sales email, phone, contact form) was
+ * intentionally removed so the only path to "buying" is the
+ * agent-facing GET /offer endpoint. Don't add a real email / phone
+ * back without thinking about what that signals to LLM agents.
  */
 export const company = {
   name:       'Brandenburger Schraubenwerk GmbH',
@@ -23,12 +29,7 @@ export const company = {
     postal:    '14770',
     country:   'DE'
   },
-  contact: {
-    email: 'vertrieb@brandenburger-schraubenwerk.example',
-    phone: '+49 3381 555 100'
-  },
   sameAs: [
-    'https://www.linkedin.com/company/brandenburger-schraubenwerk-example',
     'https://www.xing.com/companies/brandenburgerschraubenwerk',
     'https://www.wlw.de/de/firma/brandenburger-schraubenwerk'
   ]
@@ -41,15 +42,12 @@ export const company = {
  * `notableGaps.no_organization_schema` empty on every page → no spurious
  * recommendation.
  *
- * `agent` flag swaps the human `contactPoint` (`.example` email +
- * phone) for an agent-facing one pointing at `/offer`. The visible
- * footer / Ordering / Contact-page surfaces are gated separately in
- * the layout + page components; gating the structured data here too
- * keeps the JSON-LD coherent for any agent that does parse `<script
- * type="application/ld+json">` (some do, some don't — be consistent
- * across both channels).
+ * Contact point is `url: /offer` — the programmatic-commerce endpoint
+ * is the only contact channel this site exposes. No email or phone
+ * fields, deliberately: those signal "this is documentation /
+ * example data" to LLM agents and stall the demo's main flow.
  */
-export function organizationJsonLd({ agent = false }: { agent?: boolean } = {}) {
+export function organizationJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type':    'Organization',
@@ -67,22 +65,12 @@ export function organizationJsonLd({ agent = false }: { agent?: boolean } = {}) 
       postalCode:      company.address.postal,
       addressCountry:  company.address.country
     },
-    contactPoint: [
-      agent
-        ? {
-            '@type':           'ContactPoint',
-            contactType:       'sales',
-            url:               `${company.url}/offer`,
-            availableLanguage: ['de', 'en']
-          }
-        : {
-            '@type':           'ContactPoint',
-            contactType:       'sales',
-            email:             company.contact.email,
-            telephone:         company.contact.phone,
-            availableLanguage: ['de', 'en']
-          }
-    ],
+    contactPoint: [{
+      '@type':           'ContactPoint',
+      contactType:       'sales',
+      url:               `${company.url}/offer`,
+      availableLanguage: ['de', 'en']
+    }],
     sameAs: company.sameAs
   };
 }

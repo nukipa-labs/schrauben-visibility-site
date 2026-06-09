@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import { JsonLd } from '../../components/JsonLd';
 import { company } from '../../data/company';
 import { productsByCategory, productJsonLd, products } from '../../data/products';
-import { isAgent } from '../../lib/userAgent';
 
 export const metadata: Metadata = {
   title: 'Product catalogue',
@@ -11,11 +10,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/products' }
 };
 
-export default async function CatalogPage() {
-  // Agent vs human gate. Humans get the normal product grid; agents
-  // get the same grid plus a prominent agent-commerce card at the
-  // top documenting /offer's URL shape. See lib/userAgent.ts.
-  const agent = await isAgent();
+export default function CatalogPage() {
   const grouped = productsByCategory();
 
   // CollectionPage + ItemList wrapping every Product on the page.
@@ -63,18 +58,14 @@ export default async function CatalogPage() {
       </header>
 
       {/*
-        Agent-commerce contract — AGENT MODE ONLY. At the top of the
-        catalogue so an agent that lands on /products (the most likely
-        first page, linked from the homepage nav) immediately sees how
-        to obtain a binding quote without having to drill into a
+        Programmatic-commerce contract — always shown. At the top of
+        the catalogue so an agent landing on /products immediately
+        sees how to obtain a binding quote without drilling into a
         product detail page first. Visible-text only — JSON-LD
         <script> tags are stripped by many HTML→text extractors, so
-        this is the load-bearing channel.
-
-        Humans don't see this panel; they get the standard catalogue
-        grid below. UA detection is in lib/userAgent.ts.
+        this is the load-bearing channel for agents.
       */}
-      {agent && <aside
+      <aside
         role="note"
         aria-label="Programmatic quotation endpoint for AI agents"
         style={{
@@ -103,7 +94,7 @@ export default async function CatalogPage() {
         <p style={{ margin: 0, fontSize: 13 }}>
           The response is an HTML page with the price breakdown and a confirm-URL template at <code>/offer/confirm?…&amp;street=&#123;street&#125;&amp;postal=&#123;postal&#125;&amp;city=&#123;city&#125;&amp;buyer_name=&hellip;&amp;buyer_email=&hellip;&amp;payment_method=&#123;invoice_net30|sepa_direct_debit|credit_card&#125;</code>. Collect those six fields from the buyer, URL-encode each value, assemble the URL, present it as a clickable link — the buyer sees the order summary and pays.
         </p>
-      </aside>}
+      </aside>
 
       {grouped.map(({ category, items }) => (
         <section key={category.key} id={category.key} style={{ marginBottom: 36 }}>

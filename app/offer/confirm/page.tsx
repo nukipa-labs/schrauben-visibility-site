@@ -124,7 +124,7 @@ export default async function ConfirmOfferPage({ searchParams }: PageProps) {
       </form>
 
       <p className="muted" style={{ marginTop: 20, fontSize: 12 }}>
-        After paying, a confirmation is sent to <strong>{o.buyer_email}</strong>. Questions: <a href={`mailto:${company.contact.email}`}>{company.contact.email}</a>.
+        After paying, a confirmation is sent to <strong>{o.buyer_email}</strong>. Demo site — no actual payment is processed.
       </p>
     </article>
   );

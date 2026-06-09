@@ -4,7 +4,6 @@ import { Nav } from '../components/Nav';
 import { JsonLd } from '../components/JsonLd';
 import { company, organizationJsonLd } from '../data/company';
 import { productBySku, productJsonLd } from '../data/products';
-import { isAgent } from '../lib/userAgent';
 
 export const metadata: Metadata = {
   metadataBase: new URL(company.url),
@@ -23,14 +22,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' }
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  // UA detection runs once per request. Used to keep the .example
-  // sales email + phone out of the footer when an agent is fetching
-  // — the demo's whole point is the programmatic-commerce path, and
-  // a fake-tld contact line just signals "not a real shop" and
-  // breaks the agent's reasoning.
-  const agent = await isAgent();
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="de">
       <head>
@@ -48,13 +40,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           notableGaps['no_organization_schema'] empty everywhere, not
           just on the homepage.
         */}
-        <JsonLd data={organizationJsonLd({ agent })} />
+        <JsonLd data={organizationJsonLd()} />
         {/*
           Single "featured" Product JSON-LD also in the layout — gives
-          every page (incl. /about, /contact) the Product + Offer +
-          identifier + additionalProperty signals the audit checks. The
-          actual product pages still emit their own (more specific)
-          Product schema above this one in the document; whichever the
+          every page (incl. /about) the Product + Offer + identifier +
+          additionalProperty signals the audit checks. The actual
+          product pages still emit their own (more specific) Product
+          schema above this one in the document; whichever the
           conformance pass finds first wins, and the bottom-of-page
           layout-level copy is the fallback.
         */}
@@ -62,6 +54,28 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           const featured = productBySku('HX-M8-40');
           return featured ? <JsonLd data={productJsonLd(featured)} /> : null;
         })()}
+
+        {/*
+          Site-wide demo banner. Tells every visitor — human or LLM
+          agent — that this is a fictional manufacturer wired up to
+          demonstrate the GET /offer programmatic-commerce contract.
+          Putting it in the layout means it's on every page and
+          there's no chance an agent navigates to a page that looks
+          like a real shop and refuses to interact.
+        */}
+        <div style={{
+          background: '#fef3c7', borderBottom: '1px solid #fde68a',
+          padding: '10px 20px', textAlign: 'center', fontSize: 13,
+          color: '#78350f', lineHeight: 1.5
+        }}>
+          <strong>Demo site.</strong> {company.name} is a fictional manufacturer.
+          This site demonstrates a programmatic AI-agent commerce flow via the{' '}
+          <a href="/offer?items=HX-M8-40:500&delivery_country=DE" style={{ color: '#78350f', textDecoration: 'underline' }}>
+            <code style={{ fontFamily: 'Menlo, monospace', fontSize: 12 }}>GET /offer</code>
+          </a>{' '}
+          endpoint. There is no sales team, no human ordering channel — agents and humans alike use the programmatic endpoint to obtain binding quotes.
+        </div>
+
         <Nav />
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px' }}>
           {children}
@@ -72,17 +86,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         }}>
           <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
             <div>&copy; {new Date().getFullYear()} {company.name}. {company.address.street}, {company.address.postal} {company.address.locality}, {company.address.country}.</div>
-            {agent ? (
-              <div>
-                Programmatic catalogue at <a href="/products">/products</a> · Programmatic quotation at <a href="/offer">/offer</a>
-              </div>
-            ) : (
-              <div>
-                <a href={`mailto:${company.contact.email}`}>{company.contact.email}</a>
-                {' · '}
-                <a href={`tel:${company.contact.phone.replace(/\s/g, '')}`}>{company.contact.phone}</a>
-              </div>
-            )}
+            <div>
+              Programmatic catalogue at <a href="/products">/products</a> · Programmatic quotation at <a href="/offer">/offer</a>
+            </div>
           </div>
         </footer>
       </body>
