@@ -13,7 +13,7 @@ export const company = {
   legalName:  'Brandenburger Schraubenwerk GmbH',
   shortName:  'Brandenburger Schraubenwerk',
   // The deployed origin. Every JSON-LD self-reference resolves to this URL.
-  url:        'https://schraubenwerk.sites.nukipa.io',
+  url:        'https://schraubenwerk-brandenburg.sites.nukipa.io',
   logo:       '/logo.svg',
   tagline:    'Präzision in jedem Gewinde.',
   founded:    1962,
