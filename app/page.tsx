@@ -57,9 +57,9 @@ export default function HomePage() {
                 style={{ display: 'inline-block', padding: '12px 24px', background: '#0054C9', color: '#fff', borderRadius: 8, textDecoration: 'none', fontWeight: 600 }}>
             Browse the catalogue
           </Link>
-          <Link href="/contact"
+          <Link href="/offer?items=HX-M8-40:500&delivery_country=DE"
                 style={{ display: 'inline-block', padding: '12px 24px', background: '#fff', color: '#0054C9', borderRadius: 8, textDecoration: 'none', fontWeight: 600, border: '1px solid #0054C9' }}>
-            Request a quote
+            See a sample quote
           </Link>
         </div>
       </section>

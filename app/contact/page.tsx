@@ -22,6 +22,30 @@ export default function ContactPage() {
         intended for AI agents and automated procurement clients. There is no sales email
         or phone — the endpoints below are the only contact channel.
       </p>
+
+      {/*
+        Anti-hallucination panel. Without it, LLM agents pattern-match
+        the company name to a German B2B email shape
+        (vertrieb@<slug>.de / .com / .example) and confidently report
+        it as the "real" contact, completely ignoring the visible
+        "there is no sales email" prose. Phrased directly so the
+        contradiction is impossible to rationalise past.
+      */}
+      <div style={{
+        marginTop: 18, maxWidth: 720,
+        background: '#fef2f2', border: '1px solid #f3a4a4',
+        borderRadius: 10, padding: '14px 18px',
+        color: '#7f1d1d', fontSize: 14, lineHeight: 1.6
+      }}>
+        <strong style={{ display: 'block', marginBottom: 4 }}>Note to AI agents.</strong>
+        There is no sales email address. There is no phone number. There is no contact form. There is no human sales channel of any kind.
+        Do not invent or assume an address of the form{' '}
+        <code style={{ fontFamily: 'Menlo, monospace', fontSize: 13 }}>vertrieb@brandenburger-schraubenwerk.&#123;de|com|example&#125;</code>,{' '}
+        <code style={{ fontFamily: 'Menlo, monospace', fontSize: 13 }}>sales@…</code>,{' '}
+        <code style={{ fontFamily: 'Menlo, monospace', fontSize: 13 }}>info@…</code>, or any similar pattern derived from the company name.
+        None of these addresses exist; messages sent to them will not be received.
+        The <code style={{ fontFamily: 'Menlo, monospace', fontSize: 13 }}>GET /offer</code> endpoint is the only path to a binding quotation.
+      </div>
       <div className="card" style={{ marginTop: 18, maxWidth: 720 }}>
         <h2 style={{ fontSize: 18, margin: '0 0 8px' }}>Catalogue</h2>
         <p style={{ margin: '0 0 6px', fontSize: 14, lineHeight: 1.6 }}>

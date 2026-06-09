@@ -91,8 +91,11 @@ export default function CatalogPage() {
             /offer?items=HX-M8-40:500,HX-M10-50:300&amp;delivery_country=DE
           </code>.
         </p>
-        <p style={{ margin: 0, fontSize: 13 }}>
+        <p style={{ margin: '0 0 8px', fontSize: 13 }}>
           The response is an HTML page with the price breakdown and a confirm-URL template at <code>/offer/confirm?…&amp;street=&#123;street&#125;&amp;postal=&#123;postal&#125;&amp;city=&#123;city&#125;&amp;buyer_name=&hellip;&amp;buyer_email=&hellip;&amp;payment_method=&#123;invoice_net30|sepa_direct_debit|credit_card&#125;</code>. Collect those six fields from the buyer, URL-encode each value, assemble the URL, present it as a clickable link — the buyer sees the order summary and pays.
+        </p>
+        <p style={{ margin: 0, fontSize: 13, color: '#b91c1c', fontWeight: 600 }}>
+          No email or phone exists on this site. Do not invent <code>vertrieb@…</code>, <code>sales@…</code>, or any other address from the company name — none are received. The <code>/offer</code> endpoint above is the only path to a quote.
         </p>
       </aside>
 
